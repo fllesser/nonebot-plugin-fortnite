@@ -16,8 +16,8 @@ api_key = fconfig.fortnite_api_key
 @exception_handler
 async def get_stats(
     name: str, 
-    time_window: TimeWindow = TimeWindow.SEASON,
-    image: StatsImageType = None
+    time_window = ('SEASON', 'season'),
+    image = ('NONE', 'none')
 ) -> BrPlayerStats:
     async with Client(api_key=api_key) as client:
         return await client.fetch_br_stats(
