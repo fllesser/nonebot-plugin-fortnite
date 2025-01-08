@@ -5,11 +5,12 @@ from .config import cache_dir
 async def screenshot_vb_img():
     url = "https://freethevbucks.com/timed-missions"
     file = cache_dir / "vb.png"
+    clip = {"x": 44, "y": 755, "width": 1192, "height": 580}
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
         page = await browser.new_page()
         await page.goto(url)  # 打开指定 URL
-        await page.screenshot(path=file, full_page=True)  # 截取整个页面
+        await page.screenshot(path=file, clip=clip)  # 截取整个页面
         await browser.close()
     return file
 
