@@ -55,14 +55,18 @@ async def get_stats_image(name: str, time_window: str) -> Path:
 start_color = None
 end_color = None
 
-@get_driver().on_startup
+get_driver().on_startup
 async def _():
-    url = "https://github.com/fllesser/nonebot-plugin-fortnite/blob/dev/stats.png"
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url)
-        resp.raise_for_status()
-    image_stream = BytesIO(resp.content)
-    with Image.open(image_stream) as img:
+    stats_file = data_dir / "stats.png"
+    if not stats_file.exists():
+        async with httpx.AsyncClient() as client:
+            url = "https://pic1.imgdb.cn/item/677eaf4fd0e0a243d4f246d9.png"
+            resp = await client.get(url)
+            resp.raise_for_status()
+        # 保存
+        with open(stats_file, "wb") as f:
+            f.write(resp.content)
+    with Image.open(stats_file) as img:
         left, top, right, bottom = 26, 90, 423, 230
         # 获取渐变色的起始和结束颜色
         global start_color, end_color
@@ -70,18 +74,16 @@ async def _():
         end_color = img.getpixel((right, bottom))
         logger.info(f'start_color:{start_color}, end_color: {end_color}')
     
-
 async def generate_img(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)
         resp.raise_for_status()
-
-    # 如果不包含中文名，直接下载返回
+        
+    with open(file, "wb") as f:
+        f.write(resp.content)
+    # 如果不包含中文名，返回
     if not contains_chinese(name):
-        # 保存    
-        with open(file, "wb") as f:
-            f.write(resp.content)
         return file
     
     with Image.open(file) as img:
