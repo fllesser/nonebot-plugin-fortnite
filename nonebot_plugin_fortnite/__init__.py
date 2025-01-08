@@ -19,7 +19,7 @@ __plugin_meta__ = PluginMetadata(
     description="堡垒之夜战绩，季卡，商城，vb图查询",
     usage="略",
     type="application",
-    config=Config
+    config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
     supported_adapters={ "~onebot.v11" }
 )
