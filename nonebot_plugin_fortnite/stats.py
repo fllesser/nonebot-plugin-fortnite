@@ -13,17 +13,17 @@ from fortnite_api import (
 
 api_key = fconfig.fortnite_api_key
 
-@exception_handler
+@exception_handler()
 async def get_stats(
     name: str, 
-    time_window = ('SEASON', 'season'),
-    image = ('NONE', 'none')
+    time_window: TimeWindow = TimeWindow.SEASON,
+    image_type: StatsImageType = StatsImageType.None
 ) -> BrPlayerStats:
     async with Client(api_key=api_key) as client:
         return await client.fetch_br_stats(
             name=name,
             time_window=time_window,
-            image=image
+            image=image_type
         )
     
 async def get_level(name: str, time_window: str) -> int:
