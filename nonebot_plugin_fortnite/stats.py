@@ -51,30 +51,7 @@ async def get_stats_image(name: str, time_window: str) -> Path:
     stats = await get_stats(name, time_window, StatsImageType.ALL)
     return await generate_img(stats.image.url, name)
     
-# 渐变色
-start_color = None
-end_color = None
 
-@get_driver().on_startup
-async def _():
-    stats_file = data_dir / "stats.png"
-    if not stats_file.exists():
-        async with httpx.AsyncClient() as client:
-            url = "https://pic1.imgdb.cn/item/677eaf4fd0e0a243d4f246d9.png"
-            resp = await client.get(url)
-            resp.raise_for_status()
-        # 保存
-        with open(stats_file, "wb") as f:
-            f.write(resp.content)
-            
-    global start_color, end_color        
-    with Image.open(stats_file) as img:
-        left, top, right, bottom = 26, 90, 423, 230
-        # 获取渐变色的起始和结束颜色
-        start_color = img.getpixel((left, top))
-        end_color = img.getpixel((right, bottom))
-        logger.info(f'start_color:{start_color}, end_color: {end_color}')
-    
 async def generate_img(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
@@ -96,7 +73,9 @@ async def generate_img(url: str, name: str) -> Path:
         # 创建渐变色并填充矩形区域
         width = right - left
         height = bottom - top
-        global start_color, end_color
+        
+        start_color = (0, 33, 69, 255)
+        end_color = (0, 82, 106, 255)
         for i in range(width):
             for j in range(height):
                 r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
