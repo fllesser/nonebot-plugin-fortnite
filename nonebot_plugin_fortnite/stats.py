@@ -1,6 +1,7 @@
 import httpx
 import asyncio
 
+from nonebot import get_driver, logger
 from PIL import (
     Image,
     ImageFont, 
@@ -48,54 +49,75 @@ async def get_level(name: str, time_window: str) -> int:
 async def get_stats_image(name: str, time_window: str) -> Path:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window, StatsImageType.ALL)
-    url = stats.image.url
-    if contains_chinese(name):
-        return await write_cn_name(url, name)
+    return await generate_img(stats.image.url, name)
+    
+# 渐变色
+start_color = None
+end_color = None
+
+@get_driver().on_startup
+async def _():
+    stats_file = data_dir / "stats.png"
+    if not stats_file.exists():
+        async with httpx.AsyncClient() as client:
+            url = "https://github.com/fllesser/nonebot-plugin-fortnite/blob/dev/stats.png"
+            resp = await client.get(url)
+            resp.raise_for_status()
+        # 保存
+        with open(stats_file, "wb") as f:
+            f.write(resp.content)
+    with Image.open(stats_file) as img:
+        left, top, right, bottom = 26, 90, 423, 230
+        # 获取渐变色的起始和结束颜色
+        global start_color, end_color
+        start_color = img.getpixel((left, top))
+        end_color = img.getpixel((right, bottom))
+        logger.info(f'start_color:{start_color}, end_color: {end_color}')
+    
+
+async def generate_img(url: str, name: str) -> Path:
+    file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)
         resp.raise_for_status()
-    file = cache_dir / f"{name}.png"
+    # 保存    
     with open(file, "wb") as f:
         f.write(resp.content)
-    return file   
+    # 如果不包含中文名，直接下载返回
+    if not contains_chinese(name):
+        return file
+    
+    with Image.open(file) as img:
+        draw = ImageDraw.Draw(img)
 
-async def write_cn_name(url: str, name: str) -> Path:
-    # 打开原始图像
-    image = Image.open(data_dir / "stats.png")
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(url)
-    im = Image.open(BytesIO(resp.content))
-    draw = ImageDraw.Draw(im)
-    
-    # 矩形区域的坐标
-    left, top, right, bottom = 26, 90, 423, 230
-    # 获取渐变色的起始和结束颜色
-    start_color = image.getpixel((left, top))
-    end_color = image.getpixel((right, bottom))
-    
-    # 创建渐变色并填充矩形区域
-    width = right - left
-    height = bottom - top
-    
-    for i in range(width):
-        for j in range(height):
-            r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
-            g = int(start_color[1] + (end_color[1] - start_color[1]) * (i + j) / (width + height))
-            b = int(start_color[2] + (end_color[2] - start_color[2]) * (i + j) / (width + height))
-            draw.point((left + i, top + j), fill=(r, g, b))
-    # 指定字体
-    font_size = 36
-    hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
-    font = ImageFont.truetype(hansans, font_size)
-    # 计算字体坐标
-    length = draw.textlength(name, font=font)
-    x = left + (right - left - length) / 2
-    y = top + (bottom - top - font_size) / 2
-    draw.text((x, y), name, fill = "#fafafa", font = font)
-    # 保存
-    file = cache_dir / f'{name}.png'
-    im.save(file)
-    return file
+        # 矩形区域的坐标
+        left, top, right, bottom = 26, 90, 423, 230
+
+        # 创建渐变色并填充矩形区域
+        width = right - left
+        height = bottom - top
+        
+        for i in range(width):
+            for j in range(height):
+                r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
+                g = int(start_color[1] + (end_color[1] - start_color[1]) * (i + j) / (width + height))
+                b = int(start_color[2] + (end_color[2] - start_color[2]) * (i + j) / (width + height))
+                draw.point((left + i, top + j), fill=(r, g, b))
+        
+        # 指定字体
+        font_size = 36
+        hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
+        font = ImageFont.truetype(hansans, font_size)
+        
+        # 计算字体坐标
+        length = draw.textlength(name, font=font)
+        x = left + (right - left - length) / 2
+        y = top + (bottom - top - font_size) / 2
+        draw.text((x, y), name, fill = "#fafafa", font = font)
+        
+        # 保存
+        im.save(file)
+        return file
     
 def contains_chinese(text):
     import re
