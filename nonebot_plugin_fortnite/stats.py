@@ -19,12 +19,14 @@ async def get_stats(
     time_window: TimeWindow = TimeWindow.SEASON,
     image_type: StatsImageType = None
 ) -> BrPlayerStats:
+    params = {
+        'name': name,
+        'time_window': time_window
+    }
+    if image_type:
+        params['image'] = image_type
     async with Client(api_key=api_key) as client:
-        return await client.fetch_br_stats(
-            name=name,
-            time_window=time_window,
-            image=image_type
-        )
+        return await client.fetch_br_stats(**params)
     
 async def get_level(name: str, time_window: str) -> int:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
