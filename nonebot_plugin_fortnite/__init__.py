@@ -6,8 +6,6 @@ from nonebot import (
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 
-require("nonebot_plugin_localstore")
-import nonebot_plugin_localstore as store
 
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler

@@ -1,7 +1,9 @@
 import re
+from pathlib import Path
 from nonebot import require
 from nonebot.log import logger
 from nonebot.adapters import Bot, Event
+from nonebot.plugin.on import on_command
 require("nonebot_plugin_uninfo")
 from nonebot_plugin_uninfo import (
     get_session,
@@ -31,12 +33,13 @@ from .stats import (
 
 name_args = Args["name?", str]
 
+
 battle_pass = on_alconna(
     Alconna("季卡", name_args)
 )
 
 stats = on_alconna(
-    Alconna('战绩', name_args)
+    Alconna('战绩', name_args, Option())
 )
 
 @battle_pass.handle()
@@ -67,4 +70,15 @@ async def _(name: str):
 @stats.got_path('name', prompt=name_prompt)
 async def _(name: str):
     stats_img = await get_stats_image(name)
-    await stats.finish(await UniMessage(Image(url=stats_img)).export())
+    if sta
+        res = await UniMessage(Image(path=stats_img)).export()
+    else:
+        res = stats_img
+    await stats.finish(res)
+
+
+shop = on_command('商城')
+
+@shop.handle()
+async def _():
+    await shop.finish('https://www.fortnite.com/item-shop?lang=zh-Hans')
