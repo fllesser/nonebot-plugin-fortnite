@@ -66,10 +66,11 @@ async def _():
         # 保存
         with open(stats_file, "wb") as f:
             f.write(resp.content)
+            
+    global start_color, end_color        
     with Image.open(stats_file) as img:
         left, top, right, bottom = 26, 90, 423, 230
         # 获取渐变色的起始和结束颜色
-        global start_color, end_color
         start_color = img.getpixel((left, top))
         end_color = img.getpixel((right, bottom))
         logger.info(f'start_color:{start_color}, end_color: {end_color}')
