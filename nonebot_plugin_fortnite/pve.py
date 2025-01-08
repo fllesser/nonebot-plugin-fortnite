@@ -1,25 +1,29 @@
 import asyncio
-from playwright.async_api import async_playwright
+
 from PIL import Image
+from pathlib import Path
+from playwright.async_api import async_playwright
+
 from .config import cache_dir
 
-async def screenshot_vb_img():
+vb_file = cache_dir / "vb.png"
+
+async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"
-    temp_file = cache_dir / "temp.png"
-    file = cache_dir / "vb.png"
+    
     async with async_playwright() as p:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
             page = await browser.new_page()
             await page.goto(url)  # 打开指定 URL
             element = await page.query_selector('.infonotice')
-            await element.screenshot(path=temp_file)  # 截取整个页面
+            await element.screenshot(path=vb_file)  # 截取整个页面
         except Exception as e:
             raise e
         finally:
             await browser.close()
     
-    with Image.open(temp_file) as img:
+    with Image.open(vb_file) as img:
         width, height = img.size
 
         # 定义裁剪区域 (左, 上, 右, 下)
@@ -33,9 +37,9 @@ async def screenshot_vb_img():
         
         # 裁剪图像
         cropped_img = img.crop((left, top, right, bottom))
-        cropped_img.save(file)
+        cropped_img.save(vb_file)
     
-    return file
+    return vb_file
 
 
 

@@ -31,7 +31,7 @@ from .stats import (
     get_level,
     get_stats_image
 )
-from .pve import screenshot_vb_img
+from .pve import screenshot_vb_img, vb_file
 
 timewindow_prefix = ["生涯", ""]
 name_args = Args["name?", str]
@@ -90,7 +90,8 @@ async def _():
     
 vb = on_command('vb图')
 
+
+
 @vb.handle()
 async def _():
-    file = await screenshot_vb_img()
     await vb.finish(await UniMessage(Image(path=file)).export())
