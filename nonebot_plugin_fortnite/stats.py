@@ -1,6 +1,7 @@
 import asyncio
+from .config import fconfig
 
-api_key = ""
+api_key = fconfig.fortnite_api_key
 
 from fortnite_api import (
     Client,
@@ -19,10 +20,10 @@ async def get_stats_image(name: str = "墨茶OfficiaI") -> str:
         return stats.image.url
         
 
-async def main():
-   print(await get_level())
-   print(await get_stats_image())
+# async def main():
+#   print(await get_level())
+#   print(await get_stats_image())
 
-if __name__ == "__main__":
-   asyncio.run(main())
+# if __name__ == "__main__":
+#   asyncio.run(main())
    
