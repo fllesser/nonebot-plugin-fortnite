@@ -1,7 +1,6 @@
 import httpx
 import asyncio
 
-from nonebot import get_driver, logger
 from PIL import (
     Image,
     ImageFont, 
