@@ -88,7 +88,8 @@ shop = on_command('商城')
 
 @shop.handle()
 async def _():
-    await shop.finish(await UniMessage(Image(path=shop_file)).export())
+    await shop.send(await UniMessage(Image(path=shop_file)).export())
+    await shop.finish('https://www.fortnite.com/item-shop?lang=zh-Hans')
     
 update_shop = on_command('更新商城', permission=SUPERUSER)
 
