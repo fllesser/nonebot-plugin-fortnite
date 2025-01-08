@@ -76,7 +76,7 @@ async def _(arp: Arparma, name: str):
 @stats.got_path('name', prompt=name_prompt)
 async def _(arp: Arparma, name: str):
     res = await get_stats_image(name, arp.header_match.result)
-    if isinstance(res, Path)
+    if isinstance(res, Path):
         res = await UniMessage(Image(path=res)).export()
     await stats.finish(res)
 
