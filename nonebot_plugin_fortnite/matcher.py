@@ -1,5 +1,6 @@
 import re
 
+from pathlib import Path
 from nonebot import require
 from nonebot.plugin.on import on_command
 
@@ -74,13 +75,10 @@ async def _(arp: Arparma, name: str):
 
 @stats.got_path('name', prompt=name_prompt)
 async def _(arp: Arparma, name: str):
-    stats_img = await get_stats_image(name, arp.header_match.result)
-    if stats_img.startswith('http'):
-        res = await UniMessage(Image(url=stats_img)).export()
-    else:
-        res = stats_img
+    res = await get_stats_image(name, arp.header_match.result)
+    if isinstance(res, Path)
+        res = await UniMessage(Image(path=res)).export()
     await stats.finish(res)
-
 
 shop = on_command('商城')
 
