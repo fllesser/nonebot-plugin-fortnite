@@ -97,7 +97,7 @@ update_shop = on_command('更新商城', permission=SUPERUSER)
 async def _():
     try:
         file = await screenshot_shop_img()
-        await update_vb.send(await UniMessage(Text('更新vb图成功') + Image(path=file)).export())
+        await update_vb.send(await UniMessage(Text('更新商城成功') + Image(path=file)).export())
     except Exception as e:
         await update_vb.finish(f'更新商城失败 | {e}')
     
