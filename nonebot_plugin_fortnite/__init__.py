@@ -26,7 +26,7 @@ __plugin_meta__ = PluginMetadata(
 
 @scheduler.scheduled_job(
     "cron",
-    id = 'fortnite_pve_vb'
+    id = 'fortnite_pve_vb',
     hour = 8,
     minute = 10,
 )
