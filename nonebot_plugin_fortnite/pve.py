@@ -20,8 +20,19 @@ async def screenshot_vb_img():
             await browser.close()
     
     with Image.open(temp_file) as img:
-        clip = (0, 0, 500, 0)
-        cropped_img = img.crop(clip)
+        width, height = image.size
+
+        # 定义裁剪区域 (左, 上, 右, 下)
+        left = 0
+        top = 0
+        right = width - 500
+        bottom = height
+        
+        # 确保裁剪区域在图像范围内
+        right = max(right, 0)  # 确保右边界不小于 0
+        
+        # 裁剪图像
+        cropped_img = img.crop((left, top, right, bottom))
         cropped_img.save(file)
     
     return file
