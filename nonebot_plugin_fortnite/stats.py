@@ -6,24 +6,29 @@ from .config import fconfig, cache_dir
 from .other import exception_handler
 from fortnite_api import (
     Client,
-    StatsImageType
+    StatsImageType,
+    TimeWindow
 )
 
 api_key = fconfig.fortnite_api_key
 
 @exception_handler()
-async def get_level(name: str) -> int:
-    async with Client(api_key=api_key) as client:
-        stats = await client.fetch_br_stats(name=name)
-    bp = stats.battle_pass
-    return f'等级: {bp.level} 进度: {bp.progress}%'
-
-@exception_handler()
-async def get_stats_image(name: str) -> str:
+async def get_level(name: str, time_window: str) -> int:
     async with Client(api_key=api_key) as client:
         stats = await client.fetch_br_stats(
             name=name,
-            image=StatsImageType.ALL
+            time_window=TimeWindow.LIFETIME if time_window else TimeWindow.SEASON
+        )
+    bp = stats.battle_pass
+    return f'等级: {bp.level} 下一级进度: {bp.progress}%'
+
+@exception_handler()
+async def get_stats_image(name: str, time_window: str) -> str:
+    async with Client(api_key=api_key) as client:
+        stats = await client.fetch_br_stats(
+            name=name,
+            image=StatsImageType.ALL,
+            time_window=TimeWindow.LIFETIME if time_window else TimeWindow.SEASON
         )
     return stats.image.url
       
