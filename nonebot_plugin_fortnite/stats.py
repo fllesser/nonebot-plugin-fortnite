@@ -55,7 +55,7 @@ async def get_stats_image(name: str, time_window: str) -> Path:
 start_color = None
 end_color = None
 
-get_driver().on_startup
+@get_driver().on_startup
 async def _():
     stats_file = data_dir / "stats.png"
     if not stats_file.exists():
