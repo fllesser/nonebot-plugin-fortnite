@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from nonebot import require
 from nonebot.plugin.on import on_command
+from nonebot.permission import SUPERUSER
 
 require("nonebot_plugin_uninfo")
 from nonebot_plugin_uninfo import (
@@ -24,7 +25,8 @@ from arclet.alconna import (
 )
 from nonebot_plugin_alconna.uniseg import (
     UniMessage,
-    Image
+    Image,
+    Text
 )
 
 from .stats import (
@@ -90,8 +92,16 @@ async def _():
     
 vb = on_command('vb图')
 
-
-
 @vb.handle()
 async def _():
-    await vb.finish(await UniMessage(Image(path=file)).export())
+    await vb.finish(await UniMessage(Image(path=vb_file)).export())
+    
+update_vb = on_command('更新vb图', permission=SUPERUSER)
+
+@update_vb.handle()
+async def _():
+    try:
+        file = await screenshot_vb_img()
+        await update_vb.send(await UniMessage(Text('更新vb图成功'), Image(path=vb_file)).export())
+    except Exception as e:
+        await update_vb.finish(f'更新vb图失败 | {e}')
