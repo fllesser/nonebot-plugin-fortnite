@@ -102,6 +102,6 @@ update_vb = on_command('更新vb图', permission=SUPERUSER)
 async def _():
     try:
         file = await screenshot_vb_img()
-        await update_vb.send(await UniMessage(Text('更新vb图成功'), Image(path=vb_file)).export())
+        await update_vb.send(await UniMessage(Text('更新vb图成功') + Image(path=file)).export())
     except Exception as e:
         await update_vb.finish(f'更新vb图失败 | {e}')
