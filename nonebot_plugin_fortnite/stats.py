@@ -13,7 +13,7 @@ from fortnite_api import (
 
 api_key = fconfig.fortnite_api_key
 
-@exception_handler()
+
 async def get_stats(
     name: str, 
     time_window: TimeWindow = TimeWindow.SEASON,
@@ -27,13 +27,15 @@ async def get_stats(
         params['image'] = image_type
     async with Client(api_key=api_key) as client:
         return await client.fetch_br_stats(**params)
-    
+
+@exception_handler()        
 async def get_level(name: str, time_window: str) -> int:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window)
     bp = stats.battle_pass
     return f'等级: {bp.level} 下一级进度: {bp.progress}%'
 
+@exception_handler()
 async def get_stats_image(name: str, time_window: str) -> str:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window, StatsImageType.ALL)
