@@ -2,7 +2,7 @@ import httpx
 import asyncio
 
 # from pathlib import Path
-from .config import fconfig, cache_dir
+from .config import fconfig
 from .other import exception_handler
 from fortnite_api import (
     Client,

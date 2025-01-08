@@ -1,9 +1,6 @@
 import re
 
-from pathlib import Path
 from nonebot import require
-from nonebot.log import logger
-from nonebot.adapters import Bot, Event
 from nonebot.plugin.on import on_command
 
 require("nonebot_plugin_uninfo")
