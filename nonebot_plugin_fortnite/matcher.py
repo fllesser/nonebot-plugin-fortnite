@@ -47,14 +47,14 @@ async def _(
     name: Match[str]
 ):
     if name.available:
-        matcher.set_path_args('name', name.result)
+        matcher.set_path_arg('name', name.result)
         return
     # 获取群昵称
     if not session.member or not session.member.nick:
         return
     pattern = r'(?:id:|id\s)(.+)'
     if match := re.match(pattern, session.member.nick, re.IGNORECASE):
-        matcher.set_path_args('name', match.group(1))
+        matcher.set_path_arg('name', match.group(1))
         
         
 name_prompt = UniMessage.template("{:At(user, $event.get_user_id())} 请发送游戏名称(群昵称设置为id:name/ID name可快速查询)")
