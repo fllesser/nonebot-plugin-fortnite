@@ -95,7 +95,7 @@ async def generate_img(url: str, name: str) -> Path:
         # 创建渐变色并填充矩形区域
         width = right - left
         height = bottom - top
-        
+        global start_color, end_color
         for i in range(width):
             for j in range(height):
                 r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
@@ -115,7 +115,7 @@ async def generate_img(url: str, name: str) -> Path:
         draw.text((x, y), name, fill = "#fafafa", font = font)
         
         # 保存
-        im.save(file)
+        img.save(file)
         return file
     
 def contains_chinese(text):
