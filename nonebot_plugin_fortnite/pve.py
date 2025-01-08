@@ -20,7 +20,7 @@ async def screenshot_vb_img():
             await browser.close()
     
     with Image.open(temp_file) as img:
-        width, height = image.size
+        width, height = img.size
 
         # 定义裁剪区域 (左, 上, 右, 下)
         left = 0
