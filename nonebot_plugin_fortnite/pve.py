@@ -4,9 +4,9 @@ from PIL import Image
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-from .config import cache_dir
+from .config import data_dir
 
-vb_file = cache_dir / "vb.png"
+vb_file = data_dir / "vb.png"
 
 async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"

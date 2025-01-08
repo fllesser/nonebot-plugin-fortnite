@@ -12,6 +12,7 @@ from nonebot_plugin_apscheduler import scheduler
 from .config import Config
 from .matcher import *
 from .pve import screenshot_vb_img
+from .shop import screenshot_shop_img
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -26,9 +27,10 @@ __plugin_meta__ = PluginMetadata(
 
 @scheduler.scheduled_job(
     "cron",
-    id = 'fortnite_pve_vb',
+    id = 'fortnite',
     hour = 8,
-    minute = 10,
+    minute = 5,
 )
 async def _():
+    await screenshot_shop_img()
     await screenshot_vb_img()

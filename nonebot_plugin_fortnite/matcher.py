@@ -34,6 +34,7 @@ from .stats import (
     get_stats_image
 )
 from .pve import screenshot_vb_img, vb_file
+from .shop import screenshot_shop_img, shop_file
 
 timewindow_prefix = ["生涯", ""]
 name_args = Args["name?", str]
@@ -87,8 +88,17 @@ shop = on_command('商城')
 
 @shop.handle()
 async def _():
-    await shop.finish('https://www.fortnite.com/item-shop?lang=zh-Hans')
+    await shop.finish(await UniMessage(Image(path=shop_file)).export())
     
+update_shop = on_command('更新商城', permission=SUPERUSER)
+
+@update_shop.handle()
+async def _():
+    try:
+        file = await screenshot_shop_img()
+        await update_vb.send(await UniMessage(Text('更新vb图成功') + Image(path=file)).export())
+    except Exception as e:
+        await update_vb.finish(f'更新商城失败 | {e}')
     
 vb = on_command('vb图')
 
