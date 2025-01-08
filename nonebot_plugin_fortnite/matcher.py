@@ -76,7 +76,7 @@ async def _(arp: Arparma, name: str):
 async def _(arp: Arparma, name: str):
     stats_img = await get_stats_image(name, arp.header_match.result)
     if stats_img.startswith('http'):
-        res = await UniMessage(Image(path=stats_img)).export()
+        res = await UniMessage(Image(url=stats_img)).export()
     else:
         res = stats_img
     await stats.finish(res)
