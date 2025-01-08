@@ -15,7 +15,8 @@ async def screenshot_shop_img() -> Path:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
             page = await browser.new_page()
-            await page.goto(url)  # 打开指定 URL
+            await page.goto('https://www.fortnite.com/item-shop?lang=zh-Hans', timeout=60000)  # 增加超时时间
+            await page.wait_for_load_state('networkidle')  # 等待页面加载完成
             await page.screenshot(path=shop_file, full_page=True)  # 截取整个页面
         except Exception as e:
             raise e
