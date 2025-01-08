@@ -31,6 +31,7 @@ from .stats import (
     get_level,
     get_stats_image
 )
+from .pve import screenshot_vb_img
 
 timewindow_prefix = ["生涯", ""]
 name_args = Args["name?", str]
@@ -85,3 +86,11 @@ shop = on_command('商城')
 @shop.handle()
 async def _():
     await shop.finish('https://www.fortnite.com/item-shop?lang=zh-Hans')
+    
+    
+vb = on_command('vb图')
+
+@vb.handle()
+async def _():
+    file = await screenshot_vb_img()
+    await vb.finish(await UniMessage(Image(path=file)).export())
