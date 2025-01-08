@@ -1,4 +1,5 @@
 import re
+from nonebot import require
 from nonebot.log import logger
 from nonebot.adapters import Bot, Event
 require("nonebot_plugin_uninfo")
@@ -43,7 +44,7 @@ stats = on_alconna(
 async def _(
     matcher: AlconnaMatcher,
     session: Uninfo,
-    name: Math[str]
+    name: Match[str]
 ):
     if name.available:
         matcher.set_path_args('name', name.result)
@@ -52,11 +53,11 @@ async def _(
     if not session.member or not session.member.nick:
         return
     pattern = r'(?:id:|id\s)(.+)'
-    if match := re.match(pattern, session.member.nick):
+    if match := re.match(pattern, session.member.nick, re.IGNORECASE):
         matcher.set_path_args('name', match.group(1))
         
         
-name_prompt = UniMessage.template("{:At(user, $event.get_user_id())} 请发送游戏名称(群昵称设置为id:name可快速查询)")
+name_prompt = UniMessage.template("{:At(user, $event.get_user_id())} 请发送游戏名称(群昵称设置为id:name/ID name可快速查询)")
         
 @battle_pass.got_path('name', prompt=name_prompt)
 async def _(name: str):

@@ -13,6 +13,7 @@ require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import Config
+from .matcher import *
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
