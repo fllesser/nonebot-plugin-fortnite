@@ -67,15 +67,16 @@ async def cf_token():
         raise Exception(f"Failed to create task:, {result}")
 
     # Poll for result
-    for i in range(10):
-        asyncio.sleep(0)
-        url = "https://api.scrapeless.com/api/v1/getTaskResult/" + taskId
-        resp = requests.get(url, headers=headers)
-        result = resp.json()
-        if resp.status_code != 200:
-            raise Exception(str(resp))
-        if result.get("success"):
-            return result["solution"]["token"]
+    async with httpx.AsyncClient() as client:
+        for i in range(10):
+            asyncio.sleep(0)
+            url = "https://api.scrapeless.com/api/v1/getTaskResult/" + taskId
+            resp = await client.get(url, headers=headers)
+            result = resp.json()
+            if resp.status_code != 200:
+                raise Exception(str(resp))
+            if result.get("success"):
+                return result["solution"]["token"]
 
 
 
