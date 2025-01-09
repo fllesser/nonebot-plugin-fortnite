@@ -20,12 +20,12 @@ async def screenshot_shop_img() -> Path:
             
             token = await cf_token()
             # 设置 Cookie
-            await context.add_cookies({
+            await context.add_cookies([{
                 'name': "cf_clearance",
                 'value': str(token),
                 'url': url, # 确保与目标 URL 相匹配
                 'domain': "fortnite.gg" #
-            })
+            }])
 
             page = await context.new_page()
             await page.goto(url)
