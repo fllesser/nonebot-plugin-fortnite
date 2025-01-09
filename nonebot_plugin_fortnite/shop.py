@@ -24,8 +24,8 @@ async def screenshot_shop_img() -> Path:
             # 设置 Cookie
             await context.add_cookies([{
                 'name': "cf_clearance",
-                'value': str(token),
-                'url': 'fortnite.gg', # 确保与目标 URL 相匹配
+                'value': token,
+                'url': url, # 确保与目标 URL 相匹配
                 'domain': "fortnite.gg" #
             }])
 
@@ -49,8 +49,6 @@ async def cf_token():
         "version": "v3",
         "pageURL": "https://fortnite.gg/shop",
         "siteKey": "1x00000000000000000000AA",
-        "action": "",
-        "cdata": ""
     }
     payload = {
         "actor": "captcha.turnstile",
@@ -63,8 +61,7 @@ async def cf_token():
     result = resp.json()    
     taskId = result.get("taskId")
     if not taskId:
-        # print("Failed to create task:", result)
-        return
+        raise Exception(f"Failed to create task:, {result}")
 
     # Poll for result
     for i in range(10):
@@ -73,7 +70,7 @@ async def cf_token():
         resp = requests.get(url, headers=headers)
         result = resp.json()
         if resp.status_code != 200:
-            return
+            raise Exception(str(resp))
         if result.get("success"):
             return result["solution"]["token"]
 
