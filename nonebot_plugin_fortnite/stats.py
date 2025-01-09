@@ -74,7 +74,7 @@ async def _():
         font_path = chinese_fonts # 选
     else:
         hans = data_dir / "SourceHanSansSC-Bold-2.otf"
-        if hans.exists();
+        if hans.exists():
             font_path = hans
         else:
             logger.warning("系统中未找到中文字体，请前往仓库下载字体到插件data目录，否则战绩查询可能无法显示中文名称")
