@@ -39,12 +39,12 @@ async def screenshot_shop_img() -> Path:
             page = await context.new_page()
             page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
-            await page.goto(url, timeout=3000000)
+            await page.goto(url)
             # 模拟滚动到页面底部
             await page.evaluate("""() => {
                 window.scrollBy(0, document.body.scrollHeight);
             }""")
-            await page.wait_for_load_state('networkidle')
+            await page.wait_for_load_state('networkidle', timeout=300000)
             # await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file, full_page=True)
             return shop_file
