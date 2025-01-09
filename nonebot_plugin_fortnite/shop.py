@@ -57,6 +57,8 @@ async def cf_token():
         "version": "v1",
         "pageURL": "https://www.fortnite.com/item-shop?lang=zh-Hans",
         "siteKey": "0x4AAAAAAADnPIDROrmt1Wwj",
+        "action": "",
+        "cdata": ""
     }
     payload = {
         "actor": "captcha.turnstile",
@@ -77,8 +79,10 @@ async def cf_token():
             await asyncio.sleep(1)
             url = "https://api.scrapeless.com/api/v1/getTaskResult/" + taskId
             resp = await client.get(url, headers=headers)
-            result = resp.json()
+        
             if resp.status_code != 200:
-                raise Exception(str(resp))
+                raise Exception(f'请求错误: {resp}')
+                
+            result = resp.json()   
             if result.get("success"):
                 return result["solution"]["token"]
