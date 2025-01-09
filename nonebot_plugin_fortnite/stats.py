@@ -54,7 +54,7 @@ async def get_level(name: str, time_window: str) -> int:
 async def get_stats_image(name: str, time_window: str) -> Path:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window, StatsImageType.ALL)
-    return await get_stats_img_by_url(stats.image.url, name)
+    return await get_stats_img_by_url(stats.image.url, stats.user.name)
     
 
 font_path: Path | None = None
