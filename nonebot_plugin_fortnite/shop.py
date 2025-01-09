@@ -18,11 +18,11 @@ async def screenshot_shop_img() -> Path:
                 viewport={"width": 1320, "height": 2868},  # 设置为 iPhone 16 Pro Max 分辨率
                 user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15A5341f Safari/604.1"
             )
-        page = await context.new_page()
-        await page.goto(url)
-        await page.wait_for_load_state('load')  # 等待页面加载完毕
-        await page.screenshot(path=shop_file)
-        await browser.close()
+            page = await context.new_page()
+            await page.goto(url)
+            await page.wait_for_load_state('load')  # 等待页面加载完毕
+            await page.screenshot(path=shop_file)
+            await browser.close()
         except Exception as e:
             raise e
         finally:
