@@ -70,7 +70,7 @@ async def _(
         matcher.set_path_arg('name', match.group(1))
         
         
-name_prompt = UniMessage.template("{:At(user, $event.get_user_id())} 请发送游戏名称(群昵称设置为id:name/ID name可快速查询)")
+name_prompt = UniMessage.template("{:At(user, $event.get_user_id())} 请发送游戏名称\n注：群昵称设置为:\n  id:name\n  ID name\n可快速查询)")
 
 @battle_pass.got_path('name', prompt=name_prompt)
 async def _(arp: Arparma, name: str):
