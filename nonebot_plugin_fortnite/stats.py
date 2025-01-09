@@ -65,7 +65,9 @@ async def _():
     
     # 获取系统中的所有字体
     font_paths = fm.findSystemFonts()
-    
+    for item in font_paths:
+        logger.info(item)
+        # Tab to edit
     # 过滤出中文字体（假设字体名称中包含中文字符）
     chinese_fonts = [path for path in font_paths if 'SimHei' in path or 'SimSun' in path]
     global font_path
@@ -109,7 +111,7 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
         # 指定字体
         font_size = 36
         # hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
-        font = ImageFont.truetype(hansans, font_path)
+        font = ImageFont.truetype(font_path, font_size)
         
         # 计算字体坐标
         length = draw.textlength(name, font=font)
