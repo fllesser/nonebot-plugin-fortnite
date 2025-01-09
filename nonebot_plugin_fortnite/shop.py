@@ -14,16 +14,23 @@ async def screenshot_shop_img() -> Path:
     async with async_playwright() as p:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
-            page = await browser.new_page()
-            await page.goto(url, timeout=60000)  # 增加超时时间
-            await page.wait_for_load_state('networkidle')  # 等待页面加载完成
-            await page.screenshot(path=shop_file, full_page=True)  # 截取整个页面
+            context = await browser.new_context(
+                viewport={"width": 1320, "height": 2868},  # 设置为 iPhone 16 Pro Max 分辨率
+                user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15A5341f Safari/604.1"
+            )
+        page = await context.new_page()
+        await page.goto(url)
+        await page.wait_for_load_state('load')  # 等待页面加载完毕
+        await page.screenshot(path=shop_file)
+        await browser.close()
         except Exception as e:
             raise e
         finally:
             await browser.close()
             
     return shop_file 
+
+
 
 # async def solve_turnstile(logger: 'loguru.Logger', url: str, user_agent: str, user_data_path: str = None):
 #     import asyncio
