@@ -3,7 +3,7 @@ import asyncio
 
 from PIL import Image
 from pathlib import Path
-from nonebot.log import log
+from nonebot.log import logger
 from playwright.async_api import async_playwright
 
 from .config import data_dir, fconfig
