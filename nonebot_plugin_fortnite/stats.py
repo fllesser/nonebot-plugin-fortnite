@@ -1,9 +1,23 @@
 import httpx
 import asyncio
 
-# from pathlib import Path
-from .config import fconfig
-from .other import exception_handler
+from io import BytesIO
+from pathlib import Path
+from nonebot import get_driver
+from nonebot.log import logger
+
+from PIL import (
+    Image,
+    ImageFont, 
+    ImageDraw
+)
+
+from .config import (
+    fconfig,
+    cache_dir, 
+    data_dir
+)
+
 from fortnite_api import (
     Client,
     BrPlayerStats,
@@ -11,65 +25,97 @@ from fortnite_api import (
     TimeWindow
 )
 
+from .other import exception_handler
+
 api_key = fconfig.fortnite_api_key
 
-@exception_handler
 async def get_stats(
     name: str, 
     time_window: TimeWindow = TimeWindow.SEASON,
-    image: StatsImageType = None
+    image_type: StatsImageType = None
 ) -> BrPlayerStats:
+    params = {
+        'name': name,
+        'time_window': time_window
+    }
+    if image_type:
+        params['image'] = image_type
     async with Client(api_key=api_key) as client:
-        return await client.fetch_br_stats(
-            name=name,
-            time_window=time_window,
-            image=image
-        )
-    
+        return await client.fetch_br_stats(**params)
+
+@exception_handler()        
 async def get_level(name: str, time_window: str) -> int:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window)
     bp = stats.battle_pass
     return f'等级: {bp.level} 下一级进度: {bp.progress}%'
 
-async def get_stats_image(name: str, time_window: str) -> str:
+@exception_handler()
+async def get_stats_image(name: str, time_window: str) -> Path:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window, StatsImageType.ALL)
-    return stats.image.url
-      
+    return await get_stats_img_by_url(stats.image.url, name)
+    
 
-# async def write_cn_name(url: str, nickname: str):
-#     # 打开原始图像
-#     image = Image.open(IMG_PATH / "zhanji.png")
-#     async with httpx.AsyncClient() as client:
-#         resp = await client.get(url)
-#     im = Image.open(BytesIO(resp.content))
-#     draw = ImageDraw.Draw(im)
-    
-#     # 矩形区域的坐标
-#     left, top, right, bottom = 26, 90, 423, 230
-#     # 获取渐变色的起始和结束颜色
-#     start_color = image.getpixel((left, top))
-#     end_color = image.getpixel((right, bottom))
-    
-#     # 创建渐变色并填充矩形区域
-#     width = right - left
-#     height = bottom - top
-    
-#     for i in range(width):
-#         for j in range(height):
-#             r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
-#             g = int(start_color[1] + (end_color[1] - start_color[1]) * (i + j) / (width + height))
-#             b = int(start_color[2] + (end_color[2] - start_color[2]) * (i + j) / (width + height))
-#             draw.point((left + i, top + j), fill=(r, g, b))
+font_path: Path | None = None
 
-#     font_size = 36
-#     hansans = (FONT_PATH / "SourceHanSansSC-Bold-2.otf").absolute()
-#     font = ImageFont.truetype(hansans, font_size)
-#     length = draw.textlength(nickname, font=font)
-#     x = left + (right - left - length) / 2
-#     y = top + (bottom - top - font_size) / 2
-#     draw.text((x, y), nickname, fill = "#fafafa", font = font)
-#     buffered = BytesIO() 
-#     im.save(buffered, format="PNG") 
-#     return base64.b64encode(buffered.getvalue()).decode()
+@get_driver().on_startup
+async def _():
+    hans = data_dir / "SourceHanSansSC-Bold-2.otf"
+    global font_path
+    if hans.exists():
+        font_path = hans
+        logger.info(f'战绩绘图将使用字体: {font_path.name}')
+    else:
+        logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
+    
+async def get_stats_img_by_url(url: str, name: str) -> Path:
+    file = cache_dir / f"{name}.png"
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(url)
+        resp.raise_for_status()
+        
+    with open(file, "wb") as f:
+        f.write(resp.content)
+    # 如果不包含中文名，返回
+    if not font_path or not contains_chinese(name):
+        return file
+    
+    with Image.open(file) as img:
+        draw = ImageDraw.Draw(img)
+
+        # 矩形区域的坐标
+        left, top, right, bottom = 26, 90, 423, 230
+
+        # 创建渐变色并填充矩形区域
+        width = right - left
+        height = bottom - top
+        
+        start_color = (0, 33, 69, 255)
+        end_color = (0, 82, 106, 255)
+        for i in range(width):
+            for j in range(height):
+                r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
+                g = int(start_color[1] + (end_color[1] - start_color[1]) * (i + j) / (width + height))
+                b = int(start_color[2] + (end_color[2] - start_color[2]) * (i + j) / (width + height))
+                draw.point((left + i, top + j), fill=(r, g, b))
+        
+        # 指定字体
+        font_size = 36
+        # hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
+        font = ImageFont.truetype(font_path, font_size)
+        
+        # 计算字体坐标
+        length = draw.textlength(name, font=font)
+        x = left + (right - left - length) / 2
+        y = top + (bottom - top - font_size) / 2
+        draw.text((x, y), name, fill = "#fafafa", font = font)
+        
+        # 保存
+        img.save(file)
+        return file
+    
+def contains_chinese(text):
+    import re
+    pattern = re.compile(r'[\u4e00-\u9fff]')
+    return bool(pattern.search(text))
