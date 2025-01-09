@@ -11,22 +11,26 @@ from .config import data_dir, fconfig
 shop_file = data_dir / "shop.png"
 
 async def screenshot_shop_img() -> Path:
-    url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
+    # url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
+    url = "https://fortnite.gg/shop"
     
     headers = {
-      'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+      'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+      'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       'Accept-Encoding': "gzip, deflate",
-      'x-requested-with': "mark.chromium",
-      'sec-fetch-site': "same-origin",
-      'sec-fetch-mode': "no-cors",
-      'sec-fetch-dest': "script",
-      'referer': "https://www.fortnite.com/item-shop?lang=zh-Hans&__cf_chl_rt_tk=GXIQhKBq1Ku4R0Ko9ZdwpqowaqwQSkpbUVGJgkTRCEI-1736398895-1.0.1.1-NTcB9ua43wQOy7ZxZKSXFQvXTl7SZ1rqFLHgyHlddeE",
+      'upgrade-insecure-requests': "1",
+      'dnt': "1",
+      'x-requested-with': "mark.via",
+      'sec-fetch-site': "none",
+      'sec-fetch-mode': "navigate",
+      'sec-fetch-user': "?1",
+      'sec-fetch-dest': "document",
       'accept-language': "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-      'Cookie': "__cf_bm=q._ofOdPilOvXtYR92Rb.I_Uzruy8VSGbmr0uY_z0bs-1736398895-1.0.1.1-OrXATO8Ca2pzun3u5BLtaNQbgQwf8rABYQ4On6g4fKe.QZvGyoIWdAbAzAHdBq4OmFcgo_r.cwt1.bKh8cUGWQ"
+      'Cookie': "_sharedid=f02028dd-dce2-4b07-bba9-301d54e68dbd; _sharedid_cst=zix7LPQsHA%3D%3D; _lr_env_src_ats=false; hb_insticator_uid=799b5897-b5a3-48c4-a46f-8bb8bf9082ac"
     }
-    
-    token = await cf_token()
-    logger.info(token)
+        
+    # token = await cf_token()
+    # logger.info(token)
     browser = None
     try:
         async with async_playwright() as p:
@@ -34,13 +38,6 @@ async def screenshot_shop_img() -> Path:
             context = await browser.new_context()
             context.set_extra_http_headers(headers)
             # 设置 Cookie
-            await context.add_cookies([{
-                'name': "cf_clearance",
-                'value': token,
-                'url': url, # 确保与目标 URL 相匹配
-                'domain': "www.fortnite.com" #
-            }])
-
             page = await context.new_page()
             page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
