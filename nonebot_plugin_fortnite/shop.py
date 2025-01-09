@@ -6,7 +6,7 @@ from pathlib import Path
 from nonebot.log import logger
 from playwright.async_api import async_playwright
 
-from .config import data_dir, fconfig
+from .config import data_dir
 
 shop_file = data_dir / "shop.png"
 
@@ -47,51 +47,10 @@ async def screenshot_shop_img() -> Path:
                 }""")
                 await asyncio.sleep(2)  # 等待2秒以加载内容
                 
-            await page.wait_for_load_state('networkidle', timeout=180000)
+            await page.wait_for_load_state('networkidle', timeout=100000)
             # await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file, full_page=True)
             return shop_file
     finally:
         await browser.close()
 
-async def cf_token():
-    url = "https://api.scrapeless.com/api/v1/createTask"
-    token = fconfig.captcha_api_key
-    headers = {"x-api-token": token}
-    input = {
-        "version": "v1",
-        "pageURL": "https://www.fortnite.com/item-shop?lang=zh-Hans",
-        "siteKey": "0x4AAAAAAADnPIDROrmt1Wwj",
-        "action": "",
-        "cdata": ""
-    }
-    payload = {
-        "actor": "captcha.turnstile",
-        "input": input
-    }
-
-    # Create task
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(url, json=payload, headers=headers)
-        
-    if resp.status_code != 200:
-        raise Exception(f'请求错误: {resp}')
-                
-    result = resp.json()    
-    taskId = result.get("taskId")
-    if not taskId:
-        raise Exception(f"Failed to create task:, {result}")
-
-    # Poll for result
-    async with httpx.AsyncClient() as client:
-        for i in range(30):
-            await asyncio.sleep(1)
-            url = "https://api.scrapeless.com/api/v1/getTaskResult/" + taskId
-            resp = await client.get(url, headers=headers)
-        
-            if resp.status_code != 200:
-                raise Exception(f'请求错误: {resp}')
-                
-            result = resp.json()   
-            if result.get("success"):
-                return result["solution"]["token"]
