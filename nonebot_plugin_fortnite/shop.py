@@ -36,8 +36,8 @@ async def screenshot_shop_img() -> Path:
             # }])
 
             page = await context.new_page()
-            await page.goto(url)
-            await page.wait_for_load_state('load')  # 等待页面加载完毕
+            await page.goto(url, wait_until='load', timeout=90000)
+            # await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file, full_page=True)
         except Exception as e:
             raise e
