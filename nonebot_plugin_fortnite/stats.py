@@ -1,24 +1,28 @@
 import httpx
 import asyncio
 
+from io import BytesIO
+from pathlib import Path
+
 from PIL import (
     Image,
     ImageFont, 
     ImageDraw
 )
-from io import BytesIO
-from pathlib import Path
+
 from .config import (
     fconfig,
     cache_dir, 
     data_dir
 )
+
 from fortnite_api import (
     Client,
     BrPlayerStats,
     StatsImageType,
     TimeWindow
 )
+
 from .other import exception_handler
 
 api_key = fconfig.fortnite_api_key
@@ -48,10 +52,10 @@ async def get_level(name: str, time_window: str) -> int:
 async def get_stats_image(name: str, time_window: str) -> Path:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window, StatsImageType.ALL)
-    return await generate_img(stats.image.url, name)
+    return await get_stats_img_by_url(stats.image.url, name)
     
 
-async def generate_img(url: str, name: str) -> Path:
+async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
         resp = await client.get(url)

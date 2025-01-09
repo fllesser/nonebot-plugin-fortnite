@@ -27,7 +27,7 @@ async def screenshot_vb_img() -> Path:
             # 截取第二个 <div class="hot-info">
             hot_info_2 = page.locator('div.hot-info').nth(1)
             await hot_info_2.screenshot(path=data_dir / 'hot_info_2.png')
-            combine()
+            combine_imgs()
     finally:
         if browser:
             await browser.close()
@@ -36,7 +36,7 @@ async def screenshot_vb_img() -> Path:
 
 
         
-def combine():
+def combine_imgs():
     try:
         # 打开三个截图
         hot_info_1 = Image.open(data_dir / 'hot_info_1.png')
@@ -66,36 +66,3 @@ def combine():
         container_hidden_xs.close()
         hot_info_2.close()
         combined_image.close()
-
-async def screenshot_vb_img_old() -> Path:
-    url = "https://freethevbucks.com/timed-missions"
-    
-    try:
-        browser = None
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            await page.goto(url)  
-            element = await page.query_selector('.infonotice')
-            await element.screenshot(path=vb_file)  
-    finally:
-        if browser:
-            await browser.close()
-    
-    with Image.open(vb_file) as img:
-        width, height = img.size
-
-        # 定义裁剪区域 (左, 上, 右, 下)
-        left = 0
-        top = 0
-        right = width - 600
-        bottom = height
-        
-        # 确保裁剪区域在图像范围内
-        right = max(right, 0)  # 确保右边界不小于 0
-        
-        # 裁剪图像
-        cropped_img = img.crop((left, top, right, bottom))
-        cropped_img.save(vb_file)
-    
-    return vb_file
