@@ -62,6 +62,7 @@ font_path: Path | None = None
 @get_driver().on_startup
 async def _():
     hans = data_dir / "SourceHanSansSC-Bold-2.otf"
+    global font_path
     if hans.exists():
         font_path = hans
         logger.info(f'战绩绘图将使用字体: {font_path.name}')
