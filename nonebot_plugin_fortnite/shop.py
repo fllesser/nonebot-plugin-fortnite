@@ -28,7 +28,7 @@ async def screenshot_shop_img() -> Path:
                       'x-requested-with': "mark.via",
                       'sec-fetch-site': "none",
                       'sec-fetch-mode': "navigate",
-                      'sec-fetch-user': "?1",%
+                      'sec-fetch-user': "?1",
                       'sec-fetch-dest': "document",
                       'referer': 'https://fortnite.gg/',
                       'accept-language': "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
