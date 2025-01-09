@@ -30,7 +30,7 @@ async def screenshot_shop_img() -> Path:
     browser = None
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True) as browser: 
+            browser = await p.chromium.launch(headless=True)
             context = await browser.new_context()
             context.set_extra_http_headers(headers)
             # 设置 Cookie
