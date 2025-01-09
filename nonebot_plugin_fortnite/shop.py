@@ -19,20 +19,9 @@ async def screenshot_shop_img() -> Path:
             # page = await browser.new_page()
             context = await browser.new_context(
                 extra_http_headers = {
-                  'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-                  'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                  'Accept-Encoding': "gzip, deflate",
-                  'upgrade-insecure-requests': "1",
-                  'dnt': "1",
-                  'x-requested-with': "mark.via",
-                  'sec-fetch-site': "none",
-                  'sec-fetch-mode': "navigate",
-                  'sec-fetch-user': "?1",
-                  'sec-fetch-dest': "document",
-                  'referer': "https://fortnite.gg/",
-                  'accept-language': "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-                  'if-modified-since': "Thu, 09 Jan 2025 02:52:14 GMT",
-                  'Cookie': "_sharedid=f02028dd-dce2-4b07-bba9-301d54e68dbd; _sharedid_cst=zix7LPQsHA%3D%3D; _lr_retry_request=true; _lr_env_src_ats=false; hb_insticator_uid=799b5897-b5a3-48c4-a46f-8bb8bf9082ac"
+                    'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                    'referer': "https://fortnite.gg/",
+                    'Cookie': "_sharedid=f02028dd-dce2-4b07-bba9-301d54e68dbd; _sharedid_cst=zix7LPQsHA%3D%3D; _lr_retry_request=true; _lr_env_src_ats=false; hb_insticator_uid=799b5897-b5a3-48c4-a46f-8bb8bf9082ac"
                 }
             )
             
