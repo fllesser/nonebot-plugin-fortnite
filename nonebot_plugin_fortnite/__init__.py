@@ -21,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters={ "~onebot.v11" }
+    supported_adapters=None
 )
 
 
