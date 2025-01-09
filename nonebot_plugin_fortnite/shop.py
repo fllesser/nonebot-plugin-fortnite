@@ -73,8 +73,8 @@ async def cf_token():
 
     # Poll for result
     async with httpx.AsyncClient() as client:
-        for i in range(10):
-            await asyncio.sleep(0)
+        for i in range(30):
+            await asyncio.sleep(1)
             url = "https://api.scrapeless.com/api/v1/getTaskResult/" + taskId
             resp = await client.get(url, headers=headers)
             result = resp.json()
