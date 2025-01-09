@@ -66,7 +66,7 @@ async def _():
         font_path = hans
         logger.info(f'战绩绘图将使用字体: {font_path.name}')
     else:
-        logger.warning(f"请前往仓库下载字体到 {data_dir}，否则战绩查询可能无法显示中文名称")
+        logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
 
 async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
