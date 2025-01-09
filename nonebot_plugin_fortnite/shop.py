@@ -23,7 +23,7 @@ async def screenshot_shop_img() -> Path:
             await context.add_cookies([{
                 'name': "cf_clearance",
                 'value': str(token),
-                'url': url, # 确保与目标 URL 相匹配
+                'url': 'fortnite.gg/shop', # 确保与目标 URL 相匹配
                 'domain': "fortnite.gg" #
             }])
 
