@@ -9,7 +9,7 @@ from .config import data_dir
 shop_file = data_dir / "shop.png"
 
 async def screenshot_shop_img() -> Path:
-    url = "https://fortnitetracker.com/shop"
+    url = "https://fnitemshop.com"
     
     async with async_playwright() as p:
         try:
