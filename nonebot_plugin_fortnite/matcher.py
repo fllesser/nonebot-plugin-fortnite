@@ -110,7 +110,7 @@ async def _():
     finally:
         await receipt.recall(delay=1)
         
-vb = on_command('vb图')
+vb = on_command('vb图', aliases={"VB图"})
 
 @vb.handle()
 async def _():
