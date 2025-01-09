@@ -57,7 +57,8 @@ async def cf_token():
 
     # Create task
     async with httpx.AsyncClient() as client:
-        result = await client.post(url, json=payload, headers=headers).json()
+        resp = await client.post(url, json=payload, headers=headers)
+    result = resp.json()    
     taskId = result.get("taskId")
     if not taskId:
         # print("Failed to create task:", result)
