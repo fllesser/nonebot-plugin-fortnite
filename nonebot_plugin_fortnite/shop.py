@@ -14,11 +14,7 @@ async def screenshot_shop_img() -> Path:
     async with async_playwright() as p:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
-            context = await browser.new_context(
-                viewport={"width": 1320}, 
-                user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15A5341f Safari/604.1"
-            )
-            page = await context.new_page()
+            page = await browser.new_page()
             await page.goto(url)
             await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file)
