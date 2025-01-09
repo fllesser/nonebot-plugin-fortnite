@@ -39,7 +39,7 @@ async def screenshot_shop_img() -> Path:
             page = await context.new_page()
             page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
-            await page.goto(url, wait_until='networkidle', timeout=60000)
+            await page.goto(url, wait_until='networkidle', timeout=180000)
             # await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file, full_page=True)
             return shop_file
