@@ -9,6 +9,7 @@ import nonebot_plugin_localstore as store
 
 class Config(BaseModel):
     fortnite_api_key: Optional[str] = ""
+    captcha_api_key: Optional[str] = ""
     
 fconfig: Config = get_plugin_config(Config)
 

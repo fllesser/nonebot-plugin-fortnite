@@ -1,32 +1,35 @@
+import httpx
 import asyncio
 
 from PIL import Image
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-from .config import data_dir
+from .config import data_dir, fconfig
 
 shop_file = data_dir / "shop.png"
 
 async def screenshot_shop_img() -> Path:
-    url = "https://fnitemshop.com"
+    url = "https://fortnite.gg/shop"
     
     async with async_playwright() as p:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
-            context = await browser.new_context(
-                viewport={"width": 1080, "height": 2340},  # 设置为 iPhone 16 Pro Max 分辨率
-                user_agent="Mozilla/5.0 (Linux; Android 10; VOG-AL00 Build/HUAWEIVOG-AL00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.88 Mobile Safari/537.36"
-            )
+            # page = await browser.new_page()
+            context = await browser.new_context()
+            
+            token = await cf_token()
+            # 设置 Cookie
+            await context.add_cookies([{
+                'name': "cf_clearance",
+                'value': token,
+                'url': url, # 确保与目标 URL 相匹配
+                'domain': "fortnite.gg" #
+            }])
+
             page = await context.new_page()
             await page.goto(url)
             await page.wait_for_load_state('load')  # 等待页面加载完毕
-            
-            # 模拟缓慢滚动到页面底部
-            for i in range(0, 24005, 100):
-                await page.evaluate(f'window.scrollTo(0, {i})')
-                await asyncio.sleep(0.1)  # 每次滚动后等待0.1秒
-            
             await page.screenshot(path=shop_file, full_page=True)
         except Exception as e:
             raise e
@@ -35,6 +38,41 @@ async def screenshot_shop_img() -> Path:
             
     return shop_file
 
+
+async def cf_token():
+    url = "https://api.scrapeless.com/api/v1/createTask"
+    token = fconfig.captcha_api_key
+    headers = {"x-api-token": token}
+    input = {
+        "version": "{{version}}",
+        "pageURL": "https://fortnite.gg/shop",
+        "siteKey": "1x00000000000000000000AA",
+        "action": "",
+        "cdata": ""
+    }
+    payload = {
+        "actor": "captcha.turnstile",
+        "input": input
+    }
+
+    # Create task
+    async with httpx.AsyncClient() as client:
+        result = await client.post(url, json=payload, headers=headers).json()
+    taskId = result.get("taskId")
+    if not taskId:
+        # print("Failed to create task:", result)
+        return
+
+    # Poll for result
+    for i in range(10):
+        asyncio.sleep(0)
+        url = "https://api.scrapeless.com/api/v1/getTaskResult/" + taskId
+        resp = requests.get(url, headers=headers)
+        result = resp.json()
+        if resp.status_code != 200:
+            return
+        if result.get("success"):
+            return result["solution"]["token"]
 
 
 
