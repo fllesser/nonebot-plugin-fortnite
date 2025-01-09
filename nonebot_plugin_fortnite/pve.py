@@ -18,14 +18,14 @@ async def screenshot_vb_img() -> Path:
             page = await browser.new_page()
             await page.goto(url)  
             # 截取第一个 <div class="hot-info">
-            hot_info_1 = await page.locator('div.hot-info').nth(0)
+            hot_info_1 = page.locator('div.hot-info').nth(0)
             await hot_info_1.screenshot(path=data_dir / 'hot_info_1.png')
     
             # 截取 <div class="container hidden-xs">
-            container_hidden_xs = await page.locator('div.container.hidden-xs')
+            container_hidden_xs = page.locator('div.container.hidden-xs')
             await container_hidden_xs.screenshot(path=data_dir / 'container_hidden_xs.png')
             # 截取第二个 <div class="hot-info">
-            hot_info_2 = await page.locator('div.hot-info').nth(1)
+            hot_info_2 = page.locator('div.hot-info').nth(1)
             await hot_info_2.screenshot(path=data_dir / 'hot_info_2.png')
             combine()
     finally:
