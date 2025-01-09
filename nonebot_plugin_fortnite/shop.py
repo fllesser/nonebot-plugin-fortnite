@@ -15,8 +15,8 @@ async def screenshot_shop_img() -> Path:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
             context = await browser.new_context(
-                viewport={"width": 1320, "height": 2868},  # 设置为 iPhone 16 Pro Max 分辨率
-                user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15A5341f Safari/604.1"
+                viewport={"width": 1080, "height": 2340},  # 设置为 iPhone 16 Pro Max 分辨率
+                user_agent="Mozilla/5.0 (Linux; Android 10; VOG-AL00 Build/HUAWEIVOG-AL00) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.88 Mobile Safari/537.36"
             )
             page = await context.new_page()
             await page.goto(url)
