@@ -13,14 +13,25 @@ shop_file = data_dir / "shop.png"
 async def screenshot_shop_img() -> Path:
     url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
     
+    headers = {
+      'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+      'Accept-Encoding': "gzip, deflate",
+      'x-requested-with': "mark.chromium",
+      'sec-fetch-site': "same-origin",
+      'sec-fetch-mode': "no-cors",
+      'sec-fetch-dest': "script",
+      'referer': "https://www.fortnite.com/item-shop?lang=zh-Hans&__cf_chl_rt_tk=GXIQhKBq1Ku4R0Ko9ZdwpqowaqwQSkpbUVGJgkTRCEI-1736398895-1.0.1.1-NTcB9ua43wQOy7ZxZKSXFQvXTl7SZ1rqFLHgyHlddeE",
+      'accept-language': "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+      'Cookie': "__cf_bm=q._ofOdPilOvXtYR92Rb.I_Uzruy8VSGbmr0uY_z0bs-1736398895-1.0.1.1-OrXATO8Ca2pzun3u5BLtaNQbgQwf8rABYQ4On6g4fKe.QZvGyoIWdAbAzAHdBq4OmFcgo_r.cwt1.bKh8cUGWQ"
+    }
+    
+    token = await cf_token()
+    logger.info(token)
+    
     async with async_playwright() as p:
-        browser = None
-        try:
-            browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
-            # page = await browser.new_page()
-            context = await browser.new_context()  # 在这里设置忽略 HTTPS 错误
-            token = await cf_token()
-            logger.info(token)
+        async with p.chromium.launch(headless=True) as browser: 
+            context = await browser.new_context()
+            context.set_extra_http_headers(headers)
             # 设置 Cookie
             await context.add_cookies([{
                 'name': "cf_clearance",
@@ -30,18 +41,12 @@ async def screenshot_shop_img() -> Path:
             }])
 
             page = await context.new_page()
-            page.on('requestfailed', lambda request: print(f'Request failed: {request.url}'))
+            page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
             await page.goto(url, wait_until='networkidle', timeout=60000)
             # await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file, full_page=True)
-        except Exception as e:
-            raise e
-        finally:
-            if browser:
-                await browser.close()
-            
-    return shop_file
+            return shop_file
 
 
 async def cf_token():
@@ -49,7 +54,7 @@ async def cf_token():
     token = fconfig.captcha_api_key
     headers = {"x-api-token": token}
     input = {
-        "version": "v2",
+        "version": "v3",
         "pageURL": "https://www.fortnite.com/item-shop?lang=zh-Hans",
         "siteKey": "0x4AAAAAAADnPIDROrmt1Wwj",
     }
@@ -77,52 +82,3 @@ async def cf_token():
                 raise Exception(str(resp))
             if result.get("success"):
                 return result["solution"]["token"]
-
-
-
-
-
-# async def solve_turnstile(logger: 'loguru.Logger', url: str, user_agent: str, user_data_path: str = None):
-#     import asyncio
-#     from DrissionPage import ChromiumPage, ChromiumOptions
-#     options = (
-#         ChromiumOptions()
-#         .auto_port()
-#         .headless()
-#         .incognito(True)
-#         .set_user_agent(user_agent)
-#         .set_argument('--guest')
-#         .set_argument('--no-sandbox')
-#         .set_argument('--disable-gpu')
-#     )
-#     if user_data_path:
-#         options.set_user_data_path(user_data_path)
-#     page = ChromiumPage(options)
-#     page.screencast.set_save_path('turnstile')
-#     page.screencast.set_mode.video_mode()
-#     page.screencast.start()
-#     page.get(url)
-#     logger.debug('waiting for turnstile')
-#     await asyncio.sleep(2)
-#     divs = page.eles('tag:div', timeout=10)
-#     iframe = None
-#     for div in divs:
-#         if div.shadow_root:
-#             iframe = div.shadow_root.ele(
-#                 "xpath://iframe[starts-with(@src, 'https://challenges.cloudflare.com/')]",
-#                 timeout=0
-#             )
-#             if iframe:
-#                 break
-#             break
-#     body_element = iframe.ele('tag:body', timeout=10).shadow_root
-#     logger.debug('waiting for text:Verify you are human')
-#     verify_element = body_element.ele("text:Verify you are human", timeout=10)
-#     await asyncio.sleep(1)
-#     logger.debug('click verify')
-#     verify_element.offset(10, 10).click(by_js=False)
-#     logger.debug('waiting for deleted')
-#     verify_element.wait.deleted(timeout=10)
-#     await asyncio.sleep(1)
-#     page.screencast.stop()
-#     page.close()

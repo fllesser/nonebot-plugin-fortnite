@@ -12,16 +12,12 @@ async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"
     
     async with async_playwright() as p:
-        try:
-            browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
+        async with p.chromium.launch(headless=True) as browser: # 启动无头模式的 Chromium 浏览器
             page = await browser.new_page()
             await page.goto(url)  # 打开指定 URL
             element = await page.query_selector('.infonotice')
             await element.screenshot(path=vb_file)  # 截取整个页面
-        except Exception as e:
-            raise e
-        finally:
-            await browser.close()
+        
     
     with Image.open(vb_file) as img:
         width, height = img.size
