@@ -19,7 +19,6 @@ async def screenshot_shop_img() -> Path:
             browser = await p.chromium.launch(headless=True, ignore_https_errors=True)  # 启动无头模式的 Chromium 浏览器
             # page = await browser.new_page()
             context = await browser.new_context(
-                ignore_https_errors=True,
                 extra_http_headers = {
                       'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                       'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -49,6 +48,7 @@ async def screenshot_shop_img() -> Path:
             # }])
 
             page = await context.new_page()
+            page.on('requestfailed', lambda request: print(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
             await page.goto(url, wait_until='networkidle', timeout=60000)
             # await page.wait_for_load_state('load')  # 等待页面加载完毕
