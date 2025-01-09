@@ -54,7 +54,7 @@ async def cf_token():
     token = fconfig.captcha_api_key
     headers = {"x-api-token": token}
     input = {
-        "version": "v3",
+        "version": "v1",
         "pageURL": "https://www.fortnite.com/item-shop?lang=zh-Hans",
         "siteKey": "0x4AAAAAAADnPIDROrmt1Wwj",
     }
