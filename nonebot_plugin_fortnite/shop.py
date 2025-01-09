@@ -23,7 +23,7 @@ async def screenshot_shop_img() -> Path:
             await page.wait_for_load_state('load')  # 等待页面加载完毕
             
             # 模拟缓慢滚动到页面底部
-            for i in range(0, 2868, 100):
+            for i in range(0, 24005, 100):
                 await page.evaluate(f'window.scrollTo(0, {i})')
                 await asyncio.sleep(0.1)  # 每次滚动后等待0.1秒
             
