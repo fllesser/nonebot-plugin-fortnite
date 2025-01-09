@@ -37,7 +37,7 @@ async def screenshot_shop_img() -> Path:
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(extra_http_headers = headers)
             page = await context.new_page()
-            page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
+            # page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
             await page.goto(url)
             # 模拟滚动到页面底部
