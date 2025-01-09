@@ -65,17 +65,19 @@ async def _():
     
     # 获取系统中的所有字体
     font_paths = fm.findSystemFonts()
-    for item in font_paths:
-        logger.info(item)
-        # Tab to edit
+    
+    font_names = ['FZSEJW', 'SimHei', 'DroidSansFallbackFull']
     # 过滤出中文字体（假设字体名称中包含中文字符）
     chinese_fonts = [path for path in font_paths if 'SimHei' in path or 'SimSun' in path]
     global font_path
-    if chinese_fonts:
-        font_path = chinese_fonts[0]  # 选择第一个中文字体
+    if chinese_font := next(path for path in font_paths if any(name in path for name in font_names)):
+        font_path = chinese_fonts # 选
     else:
-        logger.warning("未找到中文字体，战绩查询可能无法显示中文名称")
-
+        hans = data_dir / "SourceHanSansSC-Bold-2.otf"
+        if hans.exists();
+            font_path = hans
+        else:
+            logger.warning("系统中未找到中文字体，请前往仓库下载字体到插件data目录，否则战绩查询可能无法显示中文名称")
 
 async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
