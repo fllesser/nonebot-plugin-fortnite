@@ -3,6 +3,7 @@ import asyncio
 
 from PIL import Image
 from pathlib import Path
+from nonebot.log import log
 from playwright.async_api import async_playwright
 
 from .config import data_dir, fconfig
@@ -19,11 +20,12 @@ async def screenshot_shop_img() -> Path:
             context = await browser.new_context()
             
             token = await cf_token()
+            logger.info(token)
             # 设置 Cookie
             await context.add_cookies([{
                 'name': "cf_clearance",
                 'value': str(token),
-                'url': 'fortnite.gg/shop', # 确保与目标 URL 相匹配
+                'url': 'fortnite.gg', # 确保与目标 URL 相匹配
                 'domain': "fortnite.gg" #
             }])
 
