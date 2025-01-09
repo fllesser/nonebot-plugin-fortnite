@@ -20,12 +20,12 @@ async def screenshot_shop_img() -> Path:
             
             token = await cf_token()
             # 设置 Cookie
-            await context.add_cookies([{
+            await context.add_cookies({
                 'name': "cf_clearance",
-                'value': token,
+                'value': str(token),
                 'url': url, # 确保与目标 URL 相匹配
                 'domain': "fortnite.gg" #
-            }])
+            })
 
             page = await context.new_page()
             await page.goto(url)
@@ -44,7 +44,7 @@ async def cf_token():
     token = fconfig.captcha_api_key
     headers = {"x-api-token": token}
     input = {
-        "version": "{{version}}",
+        "version": "v3",
         "pageURL": "https://fortnite.gg/shop",
         "siteKey": "1x00000000000000000000AA",
         "action": "",
