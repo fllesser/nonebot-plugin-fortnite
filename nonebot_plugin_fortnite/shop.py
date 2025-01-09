@@ -15,20 +15,22 @@ async def screenshot_shop_img() -> Path:
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
             context = await browser.new_context(
-                viewport={"width": 1320, "height": 2868},  # 设.
+                viewport={"width": 1800, "height": 2868},  # 设置为 iPhone 16 Pro Max 分辨率
                 user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15A5341f Safari/604.1"
             )
             page = await context.new_page()
             await page.goto(url)
             await page.wait_for_load_state('load')  # 等待页面加载完毕
+            await asyncio.sleep(30)  # 增加固定的等待时间
             await page.screenshot(path=shop_file, full_page=True)
-            await browser.close()
         except Exception as e:
             raise e
         finally:
             await browser.close()
             
-    return shop_file 
+    return shop_file
+
+
 
 
 
