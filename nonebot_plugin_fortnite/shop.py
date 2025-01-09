@@ -19,6 +19,7 @@ async def screenshot_shop_img() -> Path:
             browser = await p.chromium.launch(headless=True, ignore_https_errors=True)  # 启动无头模式的 Chromium 浏览器
             # page = await browser.new_page()
             context = await browser.new_context(
+                ignore_https_errors=True,
                 extra_http_headers = {
                       'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                       'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -36,7 +37,7 @@ async def screenshot_shop_img() -> Path:
                       'Cookie': "_sharedid=f02028dd-dce2-4b07-bba9-301d54e68dbd; _sharedid_cst=zix7LPQsHA%3D%3D; _lr_retry_request=true; _lr_env_src_ats=false; hb_insticator_uid=799b5897-b5a3-48c4-a46f-8bb8bf9082ac"
                     }
                 )
-            
+            #.context = await browser.new_context()  # 在这里设置忽略 HTTPS 错误
             # token = await cf_token()
             # logger.info(token)
             # # 设置 Cookie
