@@ -11,13 +11,17 @@ vb_file = data_dir / "vb.png"
 async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"
     
-    async with async_playwright() as p:
-        async with p.chromium.launch(headless=True) as browser: # 启动无头模式的 Chromium 浏览器
+    try:
+        browser = None
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
-            await page.goto(url)  # 打开指定 URL
+            await page.goto(url)  
             element = await page.query_selector('.infonotice')
-            await element.screenshot(path=vb_file)  # 截取整个页面
-        
+            await element.screenshot(path=vb_file)  
+    finally:
+        if browser:
+            await browser.close()
     
     with Image.open(vb_file) as img:
         width, height = img.size

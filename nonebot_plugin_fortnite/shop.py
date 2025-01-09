@@ -27,9 +27,10 @@ async def screenshot_shop_img() -> Path:
     
     token = await cf_token()
     logger.info(token)
-    
-    async with async_playwright() as p:
-        async with p.chromium.launch(headless=True) as browser: 
+    browser = None
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True) as browser: 
             context = await browser.new_context()
             context.set_extra_http_headers(headers)
             # 设置 Cookie
@@ -47,7 +48,8 @@ async def screenshot_shop_img() -> Path:
             # await page.wait_for_load_state('load')  # 等待页面加载完毕
             await page.screenshot(path=shop_file, full_page=True)
             return shop_file
-
+    finally:
+        await browser.close()
 
 async def cf_token():
     url = "https://api.scrapeless.com/api/v1/createTask"
@@ -68,6 +70,10 @@ async def cf_token():
     # Create task
     async with httpx.AsyncClient() as client:
         resp = await client.post(url, json=payload, headers=headers)
+        
+    if resp.status_code != 200:
+        raise Exception(f'请求错误: {resp}')
+                
     result = resp.json()    
     taskId = result.get("taskId")
     if not taskId:

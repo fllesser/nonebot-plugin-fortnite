@@ -104,9 +104,9 @@ async def _():
     try:
         receipt = await UniMessage.text("正在更新商城，请稍后...").send()
         file = await screenshot_shop_img()
-        await update_vb.send(await UniMessage(Text('更新商城成功') + Image(path=file)).export())
+        await update_vb.send(await UniMessage(Text('手动更新商城成功') + Image(path=file)).export())
     except Exception as e:
-        await update_vb.send(f'更新商城失败 | {e}')
+        await update_vb.send(f'手动更新商城失败 | {e}')
     finally:
         await receipt.recall(delay=1)
         
@@ -123,8 +123,8 @@ async def _():
     try:
         receipt = await UniMessage.text("正在更新vb图，请稍后...").send()
         file = await screenshot_vb_img()
-        await update_vb.send(await UniMessage(Text('更新vb图成功') + Image(path=file)).export())
+        await update_vb.send(await UniMessage(Text('手动更新vb图成功') + Image(path=file)).export())
     except Exception as e:
-        await update_vb.send(f'更新vb图失败 | {e}')
+        await update_vb.send(f'手动更新vb图失败 | {e}')
     finally:
         await receipt.recall(delay=1)
