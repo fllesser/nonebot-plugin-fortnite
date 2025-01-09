@@ -67,11 +67,12 @@ async def _():
     font_paths = fm.findSystemFonts()
     
     font_names = ['FZSEJW', 'SimHei', 'DroidSansFallbackFull']
-    # 过滤出中文字体（假设字体名称中包含中文字符）
-    chinese_fonts = [path for path in font_paths if 'SimHei' in path or 'SimSun' in path]
+    # 过滤出中文字体（假设字体名称中包含中文字符
     global font_path
-    if chinese_font := next(path for path in font_paths if any(name in path for name in font_names)):
-        font_path = chinese_fonts # 选
+    chinese_fonts = [path for path in font_paths if any(name in path for name in font_names)]
+    # 检查是否找到中文字体
+    if chinese_fonts:
+        font_path = chinese_fonts[0]
     else:
         hans = data_dir / "SourceHanSansSC-Bold-2.otf"
         if hans.exists():
