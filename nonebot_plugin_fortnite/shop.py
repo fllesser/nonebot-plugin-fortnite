@@ -14,6 +14,7 @@ async def screenshot_shop_img() -> Path:
     url = "https://fortnite.gg/shop"
     
     async with async_playwright() as p:
+        browser = None
         try:
             browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
             # page = await browser.new_page()
@@ -54,7 +55,8 @@ async def screenshot_shop_img() -> Path:
         except Exception as e:
             raise e
         finally:
-            await browser.close()
+            if browser:
+                await browser.close()
             
     return shop_file
 
