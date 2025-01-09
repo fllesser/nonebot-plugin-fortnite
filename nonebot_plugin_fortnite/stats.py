@@ -61,24 +61,12 @@ font_path: Path | None = None
 
 @get_driver().on_startup
 async def _():
-    import matplotlib.font_manager as fm
-    
-    # 获取系统中的所有字体
-    font_paths = fm.findSystemFonts()
-    
-    font_names = ['FZSEJW', 'SimHei', 'DroidSansFallbackFull']
-    # 过滤出中文字体（假设字体名称中包含中文字符
-    global font_path
-    chinese_fonts = [path for path in font_paths if any(name in path for name in font_names)]
-    # 检查是否找到中文字体
-    if chinese_fonts:
-        font_path = chinese_fonts[0]
+    hans = data_dir / "SourceHanSansSC-Bold-2.otf"
+    if hans.exists():
+        font_path = hans
+        logger.info(f'战绩绘图将使用字体: {font_path.name}')
     else:
-        hans = data_dir / "SourceHanSansSC-Bold-2.otf"
-        if hans.exists():
-            font_path = hans
-        else:
-            logger.warning("系统中未找到中文字体，请前往仓库下载字体到插件data目录，否则战绩查询可能无法显示中文名称")
+        logger.warning(f"请前往仓库下载字体到 {data_dir}，否则战绩查询可能无法显示中文名称")
 
 async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
@@ -89,7 +77,7 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
     with open(file, "wb") as f:
         f.write(resp.content)
     # 如果不包含中文名，返回
-    if not contains_chinese(name) or not font_path:
+    if not font_path or not contains_chinese(name):
         return file
     
     with Image.open(file) as img:
