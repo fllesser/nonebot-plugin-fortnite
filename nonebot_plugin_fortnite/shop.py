@@ -15,7 +15,7 @@ async def screenshot_shop_img() -> Path:
     
     async with async_playwright() as p:
         try:
-            browser = await p.chromium.launch(headless=True, ignore_https_errors=True)  # 启动无头模式的 Chromium 浏览器
+            browser = await p.chromium.launch(headless=True)  # 启动无头模式的 Chromium 浏览器
             # page = await browser.new_page()
             context = await browser.new_context(
                 extra_http_headers = {
