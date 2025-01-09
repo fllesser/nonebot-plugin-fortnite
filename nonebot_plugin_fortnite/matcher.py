@@ -74,15 +74,21 @@ name_prompt = UniMessage.template("{:At(user, $event.get_user_id())} 请发送�
 
 @battle_pass.got_path('name', prompt=name_prompt)
 async def _(arp: Arparma, name: str):
-    level_info = await get_level(name, arp.header_match.result)
-    await battle_pass.finish(level_info)
+    header = arp.header_match.result
+    receipt = await UniMessage.text(f'正在查询 {name} 的{header}，请稍后...').send()
+    level_info = await get_level(name, header)
+    await battle_pass.send(level_info)
+    await receipt.recall(delay=1)
 
 @stats.got_path('name', prompt=name_prompt)
 async def _(arp: Arparma, name: str):
-    res = await get_stats_image(name, arp.header_match.result)
+    header = arp.header_match.result
+    receipt = await UniMessage.text(f'正在查询 {name} 的{header}，请稍后...').send()
+    res = await get_stats_image(name, header)
     if isinstance(res, Path):
         res = await UniMessage(Image(path=res)).export()
-    await stats.finish(res)
+    await stats.send(res)
+    await receipt.recall(delay=1)
 
 shop = on_command('商城')
 
@@ -96,11 +102,14 @@ update_shop = on_command('更新商城', permission=SUPERUSER)
 @update_shop.handle()
 async def _():
     try:
+        receipt = await UniMessage.text("正在更新商城，请稍后...").send()
         file = await screenshot_shop_img()
         await update_vb.send(await UniMessage(Text('更新商城成功') + Image(path=file)).export())
     except Exception as e:
-        await update_vb.finish(f'更新商城失败 | {e}')
-    
+        await update_vb.send(f'更新商城失败 | {e}')
+    finally:
+        await receipt.recall(delay=1)
+        
 vb = on_command('vb图')
 
 @vb.handle()
@@ -112,7 +121,10 @@ update_vb = on_command('更新vb图', permission=SUPERUSER)
 @update_vb.handle()
 async def _():
     try:
+        receipt = await UniMessage.text("正在更新vb图，请稍后...").send()
         file = await screenshot_vb_img()
         await update_vb.send(await UniMessage(Text('更新vb图成功') + Image(path=file)).export())
     except Exception as e:
-        await update_vb.finish(f'更新vb图失败 | {e}')
+        await update_vb.send(f'更新vb图失败 | {e}')
+    finally:
+        await receipt.recall(delay=1)
