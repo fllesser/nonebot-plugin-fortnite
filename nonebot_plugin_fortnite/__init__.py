@@ -24,6 +24,11 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={ "~onebot.v11" }
 )
 
+@get_driver().on_startup
+async def _():
+    async with httpx.AsyncClient() as client:
+        resp = await client.get()
+
 
 @scheduler.scheduled_job(
     "cron",
