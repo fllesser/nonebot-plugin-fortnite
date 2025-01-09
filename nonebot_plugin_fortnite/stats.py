@@ -3,6 +3,8 @@ import asyncio
 
 from io import BytesIO
 from pathlib import Path
+from nonebot import get_driver
+from nonebot.log import logger
 
 from PIL import (
     Image,
@@ -55,6 +57,24 @@ async def get_stats_image(name: str, time_window: str) -> Path:
     return await get_stats_img_by_url(stats.image.url, name)
     
 
+font_path: Path | None = None
+
+@get_driver().on_startup
+async def _():
+    import matplotlib.font_manager as fm
+    
+    # 获取系统中的所有字体
+    font_paths = fm.findSystemFonts()
+    
+    # 过滤出中文字体（假设字体名称中包含中文字符）
+    chinese_fonts = [path for path in font_paths if 'SimHei' in path or 'SimSun' in path]
+    global font_path
+    if chinese_fonts:
+        font_path = chinese_fonts[0]  # 选择第一个中文字体
+    else:
+        logger.warning("未找到中文字体，战绩查询可能无法显示中文名称")
+
+
 async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
@@ -64,7 +84,7 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
     with open(file, "wb") as f:
         f.write(resp.content)
     # 如果不包含中文名，返回
-    if not contains_chinese(name):
+    if not contains_chinese(name) or not font_path:
         return file
     
     with Image.open(file) as img:
@@ -88,8 +108,8 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
         
         # 指定字体
         font_size = 36
-        hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
-        font = ImageFont.truetype(hansans, font_size)
+        # hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
+        font = ImageFont.truetype(hansans, font_path)
         
         # 计算字体坐标
         length = draw.textlength(name, font=font)

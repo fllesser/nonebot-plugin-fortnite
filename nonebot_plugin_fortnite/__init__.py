@@ -1,4 +1,3 @@
-import httpx
 from nonebot import (
     require,
     get_driver, # @get_driver().on_startup 装饰启动时运行函数
@@ -25,10 +24,6 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={ "~onebot.v11" }
 )
 
-@get_driver().on_startup
-async def _():
-    async with httpx.AsyncClient() as client:
-        resp = await client.get()
 
 
 @scheduler.scheduled_job(
