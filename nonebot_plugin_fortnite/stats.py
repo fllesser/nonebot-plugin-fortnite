@@ -48,13 +48,13 @@ async def get_level(name: str, time_window: str) -> int:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window)
     bp = stats.battle_pass
-    return f'等级: {bp.level} 下一级进度: {bp.progress}%'
+    return f'{stats.user.name}: Lv{bp.level} | {bp.progress}% to Lv{bp.level + 1}'
 
 @exception_handler()
 async def get_stats_image(name: str, time_window: str) -> Path:
     time_window = TimeWindow.LIFETIME if time_window.startswith("生涯") else TimeWindow.SEASON
     stats = await get_stats(name, time_window, StatsImageType.ALL)
-    return await get_stats_img_by_url(stats.image.url, name)
+    return await get_stats_img_by_url(stats.image.url, stats.user.name)
     
 
 font_path: Path | None = None
