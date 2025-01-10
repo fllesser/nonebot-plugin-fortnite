@@ -41,14 +41,28 @@ async def screenshot_shop_img() -> Path:
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
             await page.goto(url)
             # 模拟滚动到页面底部
-            for _ in range(10):
-                await page.evaluate("""() => {
-                    window.scrollBy(0, document.body.scrollHeight);
-                }""")
-                await asyncio.sleep(2)  # 等待2秒以加载内容
+            # for _ in range(10):
+            #     await page.evaluate("""() => {
+            #         window.scrollBy(0, document.body.scrollHeight);
+            #     }""")
+            #     await asyncio.sleep(2)  # 等待2秒以加载内容
                 
-            await page.wait_for_load_state('networkidle', timeout=100000)
-            # await page.wait_for_load_state('load')  # 等待页面加载完毕
+            # await page.wait_for_load_state('networkidle', timeout=100000)
+            # # await page.wait_for_load_state('load')  # 等待页面加载完毕
+            async def scroll_page():
+                for _ in range(10):
+                    await page.evaluate("""() => {
+                        window.scrollBy(0, document.body.scrollHeight / 10);
+                    }""")
+                    await asyncio.sleep(3)  # 等待2秒以加载内容
+            async def wait_for_load():
+                await page.wait_for_load_state('networkidle', timeout=100000)            
+            
+            await asyncio.gather(
+                scroll_page(),
+                wait_for_load()
+            )
+            
             await page.screenshot(path=shop_file, full_page=True)
             return shop_file
     finally:
