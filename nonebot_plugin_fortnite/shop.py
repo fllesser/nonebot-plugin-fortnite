@@ -49,18 +49,19 @@ async def screenshot_shop_img() -> Path:
                 
             # await page.wait_for_load_state('networkidle', timeout=100000)
             # # await page.wait_for_load_state('load')  # 等待页面加载完毕
+            async def wait_for_load():
+                await page.wait_for_load_state('networkidle', timeout=100000)            
+            
             async def scroll_page():
                 for _ in range(10):
                     await page.evaluate("""() => {
                         window.scrollBy(0, document.body.scrollHeight / 10);
                     }""")
                     await asyncio.sleep(3)  # 等待2秒以加载内容
-            async def wait_for_load():
-                await page.wait_for_load_state('networkidle', timeout=100000)            
             
             await asyncio.gather(
-                scroll_page(),
-                wait_for_load()
+                wait_for_load(),
+                scroll_page()
             )
             
             await page.screenshot(path=shop_file, full_page=True)
