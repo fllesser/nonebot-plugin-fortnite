@@ -40,24 +40,16 @@ async def screenshot_shop_img() -> Path:
             # page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
             await page.add_style_tag(content='* { transition: none !important; animation: none !important; }')
             await page.goto(url)
-            # 模拟滚动到页面底部
-            # for _ in range(10):
-            #     await page.evaluate("""() => {
-            #         window.scrollBy(0, document.body.scrollHeight);
-            #     }""")
-            #     await asyncio.sleep(2)  # 等待2秒以加载内容
-                
-            # await page.wait_for_load_state('networkidle', timeout=100000)
-            # # await page.wait_for_load_state('load')  # 等待页面加载完毕
+
             async def wait_for_load():
-                await page.wait_for_load_state('networkidle', timeout=100000)            
+                await page.wait_for_load_state('networkidle', timeout=60000)            
             
             async def scroll_page():
-                for _ in range(10):
+                for _ in range(20):
                     await page.evaluate("""() => {
-                        window.scrollBy(0, document.body.scrollHeight / 10);
+                        window.scrollBy(0, document.body.scrollHeight / 20);
                     }""")
-                    await asyncio.sleep(1)  # 等待2秒以加载内容
+                    await asyncio.sleep(1)  # 等待1秒以加载内容
             
             await asyncio.gather(
                 wait_for_load(),
