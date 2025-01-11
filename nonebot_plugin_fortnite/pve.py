@@ -16,20 +16,26 @@ async def screenshot_vb_img() -> Path:
             page = await browser.new_page()
             await page.goto(url)
             
-            # Check and screenshot the first <div class="hot-info">
+            # 截图函数，超时则跳过
+            async def take_screenshot(locator, path):
+                try:
+                    await locator.scroll_into_view_if_needed()
+                    await locator.wait_for_element_state('visible', timeout=5000)
+                    await locator.screenshot(path=path)
+                except Exception:
+                    pass
+            
+            # 截取第一个 <div class="hot-info">
             hot_info_1 = page.locator('div.hot-info').nth(0)
-            if await hot_info_1.count() > 0:
-                await hot_info_1.screenshot(path=data_dir / 'hot_info_1.png')
+            await take_screenshot(hot_info_1, data_dir / 'hot_info_1.png')
             
-            # Check and screenshot <div class="container hidden-xs">
+            # 截取 <div class="container hidden-xs">
             container_hidden_xs = page.locator('div.container.hidden-xs')
-            if await container_hidden_xs.count() > 0:
-                await container_hidden_xs.screenshot(path=data_dir / 'container_hidden_xs.png')
+            await take_screenshot(container_hidden_xs, data_dir / 'container_hidden_xs.png')
             
-            # Check and screenshot the second <div class="hot-info">
+            # 截取第二个 <div class="hot-info">
             hot_info_2 = page.locator('div.hot-info').nth(1)
-            if await hot_info_2.count() > 0:
-                await hot_info_2.screenshot(path=data_dir / 'hot_info_2.png')
+            await take_screenshot(hot_info_2, data_dir / 'hot_info_2.png')
             
             combine_imgs()
     finally:
@@ -40,29 +46,32 @@ async def screenshot_vb_img() -> Path:
 
 def combine_imgs():
     try:
-        # Open the screenshots if they exist
+        # 打开截图文件（如果存在）
         images = []
         for img_name in ['hot_info_1.png', 'container_hidden_xs.png', 'hot_info_2.png']:
             img_path = data_dir / img_name
             if img_path.exists():
                 images.append(Image.open(img_path))
         
-        # Get dimensions and create a new image
+        # 获取尺寸并创建新图像
         widths, heights = zip(*(img.size for img in images))
         total_width = max(widths)
         total_height = sum(heights)
         combined_image = Image.new('RGB', (total_width, total_height))
         
-        # Paste images into the new image
+        # 将截图粘贴到新图像中
         y_offset = 0
         for img in images:
             combined_image.paste(img, (0, y_offset))
             y_offset += img.height
         
-        # Save the combined image
+        # 保存合并后的图像
         combined_image.save(vb_file)
     finally:
-        # Close all opened images
+        # 关闭并删除所有截图文件
         for img in images:
             img.close()
+            img_path = data_dir / img.filename
+            if img_path.exists():
+                img_path.unlink()
         combined_image.close()
