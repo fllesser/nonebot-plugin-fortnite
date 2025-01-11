@@ -22,8 +22,6 @@ async def screenshot_vb_img() -> Path:
             # 截图函数，超时则跳过
             async def take_screenshot(locator, path):
                 try:
-                    await locator.scroll_into_view_if_needed()
-                 
                     # 检查元素内容是否为空
                     content = await locator.inner_html()
                     if content.strip():  # 如果内容不为空
@@ -62,6 +60,8 @@ def combine_imgs():
             if img_path.exists():
                 images.append(Image.open(img_path))
         
+        if not images:
+            return
         # 获取尺寸并创建新图像
         widths, heights = zip(*(img.size for img in images))
         total_width = max(widths)
