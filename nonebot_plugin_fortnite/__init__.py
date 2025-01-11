@@ -18,8 +18,6 @@ from .matcher import *
 from .pve import screenshot_vb_img
 from .shop import screenshot_shop_img
 
-alc_plugin: Plugin = get_plugin("nonebot_plugin_alconna")
-
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
     description="堡垒之夜战绩，季卡，商城，vb图查询",
@@ -27,7 +25,7 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters=alc_plugin.metadata.supported_adapters
+    supported_adapters=get_plugin("nonebot_plugin_alconna").metadata.supported_adapters
 )
 
 
