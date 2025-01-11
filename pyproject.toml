@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-fortnite"
-version = "0.1.2"
+version = "0.1.3"
 description = "堡垒之夜插件"
 authors = ["fllesser <fllessive@gmail.com>"]
 readme = "README.md"
@@ -11,7 +11,7 @@ keywords = ["nonebot", "nonebot2"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-httpx = "^0.27.2"
+httpx = ">=0.27.0,<1.0.0"
 pillow = "^10.4.0"
 playwright = "^1.4.9.1"
 nonebot2 = "^2.4.0"

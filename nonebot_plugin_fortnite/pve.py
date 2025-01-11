@@ -2,12 +2,12 @@ import asyncio
 from PIL import Image
 from pathlib import Path
 from playwright.async_api import async_playwright
-from .config import data_dir
+from .config import data_dir, cache_dir
 
 vb_file = data_dir / "vb.png"
-hot_info_1_path = data_dir / 'hot_info_1.png'
-container_hidden_xs_path = data_dir / 'container_hidden_xs.png'
-hot_info_2_path = data_dir / 'hot_info_2.png'
+hot_info_1_path = cache_dir / 'hot_info_1.png'
+container_hidden_xs_path = cache_dir / 'container_hidden_xs.png'
+hot_info_2_path = cache_dir / 'hot_info_2.png'
 
 async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"
@@ -22,8 +22,6 @@ async def screenshot_vb_img() -> Path:
             # 截图函数，超时则跳过
             async def take_screenshot(locator, path):
                 try:
-                    await locator.scroll_into_view_if_needed()
-                 
                     # 检查元素内容是否为空
                     content = await locator.inner_html()
                     if content.strip():  # 如果内容不为空
@@ -54,14 +52,14 @@ async def screenshot_vb_img() -> Path:
     return vb_file
 
 def combine_imgs():
+    # 打开截图文件（如果存在）
+    combined_image = None
+    img_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
+    img_paths = [i for i in img_paths if i.exists()]
+    if not img_paths:
+        raise Exception('所有选择器的截图文件均不存在')
     try:
-        # 打开截图文件（如果存在）
-        images = []
-        image_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
-        for image_path in image_paths:
-            if img_path.exists():
-                images.append(Image.open(img_path))
-        
+        images = [Image.open(img_path) for img_path in img_paths]
         # 获取尺寸并创建新图像
         widths, heights = zip(*(img.size for img in images))
         total_width = max(widths)
@@ -80,7 +78,7 @@ def combine_imgs():
         # 关闭并删除所有截图文件
         for img in images:
             img.close()
-        for img_path in image_paths:
-            if img_path.exists():
-                img_path.unlink()
-        combined_image.close()
+        for img_path in img_paths:
+            img_path.unlink()
+        if combined_image:
+            combined_image.close()

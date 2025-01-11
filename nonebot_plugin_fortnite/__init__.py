@@ -1,12 +1,16 @@
 from nonebot import (
     require,
     get_driver, # @get_driver().on_startup 装饰启动时运行函数
-    get_bots    # dict[str, BaseBot]
+    get_bots,   # dict[str, BaseBot]
+    get_plugin
 )
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 
+require("nonebot_plugin_uninfo")
+require("nonebot_plugin_alconna")
 require("nonebot_plugin_apscheduler")
+require("nonebot_plugin_localstore")
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import Config
@@ -21,9 +25,8 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters=None
+    supported_adapters=get_plugin("nonebot_plugin_alconna").metadata.supported_adapters
 )
-
 
 
 @scheduler.scheduled_job(
@@ -33,5 +36,11 @@ __plugin_meta__ = PluginMetadata(
     minute = 5,
 )
 async def _():
-    await screenshot_shop_img()
-    await screenshot_vb_img()
+    try:
+        await screenshot_shop_img()
+    except Exception as e:
+        logger.warning(f'商城更新失败: {e}')
+    try:
+        await screenshot_vb_img()
+    except Exception:
+        logger.warning(f'vb图更新失败: {e}')
