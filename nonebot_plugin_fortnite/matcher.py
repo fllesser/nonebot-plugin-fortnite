@@ -4,13 +4,10 @@ from pathlib import Path
 from nonebot import require
 from nonebot.plugin.on import on_command
 from nonebot.permission import SUPERUSER
-
-require("nonebot_plugin_uninfo")
 from nonebot_plugin_uninfo import (
     get_session,
     Uninfo
 )
-require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import (
     on_alconna,
     AlconnaMatcher,

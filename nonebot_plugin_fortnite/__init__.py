@@ -1,18 +1,24 @@
 from nonebot import (
     require,
     get_driver, # @get_driver().on_startup 装饰启动时运行函数
-    get_bots    # dict[str, BaseBot]
+    get_bots,   # dict[str, BaseBot]
+    get_plugin
 )
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 
+require("nonebot_plugin_uninfo")
+require("nonebot_plugin_alconna")
 require("nonebot_plugin_apscheduler")
+require("nonebot_plugin_localstore")
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import Config
 from .matcher import *
 from .pve import screenshot_vb_img
 from .shop import screenshot_shop_img
+
+alc_plugin: Plugin = nonebot.get_plugin("nonebot_plugin_alconna")
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -21,7 +27,7 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters=None
+    supported_adapters=alc_plugin.metadata.supported_adapters
 )
 
 
@@ -33,5 +39,11 @@ __plugin_meta__ = PluginMetadata(
     minute = 5,
 )
 async def _():
-    await screenshot_shop_img()
-    await screenshot_vb_img()
+    try:
+        await screenshot_shop_img()
+    except Exception:
+        pass
+    try:
+        await screenshot_vb_img()
+    except Exception:
+        pass

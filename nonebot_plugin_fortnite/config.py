@@ -3,7 +3,6 @@ from typing import Optional
 from nonebot import get_plugin_config, require
 
 from pathlib import Path
-require("nonebot_plugin_localstore")
 import nonebot_plugin_localstore as store
 
 
