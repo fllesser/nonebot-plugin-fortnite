@@ -52,17 +52,14 @@ async def screenshot_vb_img() -> Path:
     return vb_file
 
 def combine_imgs():
+    # 打开截图文件（如果存在）
+    combined_image = None
+    img_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
+    img_paths = [i for i in img_paths if i.exists()]
+    if not img_paths:
+        raise Exception('所有选择器的截图文件均不存在')
     try:
-        # 打开截图文件（如果存在）
-        images = []
-        combined_image = None
-        image_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
-        for img_path in image_paths:
-            if img_path.exists():
-                images.append(Image.open(img_path))
-        
-        if not images:
-            return
+        images = [Image.open(img_path) for img_path in img_paths]
         # 获取尺寸并创建新图像
         widths, heights = zip(*(img.size for img in images))
         total_width = max(widths)
@@ -81,8 +78,7 @@ def combine_imgs():
         # 关闭并删除所有截图文件
         for img in images:
             img.close()
-        for img_path in image_paths:
-            if img_path.exists():
-                img_path.unlink()
+        for img_path in img_paths:
+            img_path.unlink()
         if combined_image:
             combined_image.close()
