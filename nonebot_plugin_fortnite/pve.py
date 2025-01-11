@@ -82,5 +82,5 @@ def combine_imgs():
             img.close()
         for img_path in image_paths:
             if img_path.exists():
-                img_path.filename.unlink()
+                img_path.unlink()
         combined_image.close()
