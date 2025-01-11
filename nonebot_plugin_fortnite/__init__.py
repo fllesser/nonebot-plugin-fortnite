@@ -18,7 +18,7 @@ from .matcher import *
 from .pve import screenshot_vb_img
 from .shop import screenshot_shop_img
 
-alc_plugin: Plugin = nonebot.get_plugin("nonebot_plugin_alconna")
+alc_plugin: Plugin = get_plugin("nonebot_plugin_alconna")
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -31,7 +31,6 @@ __plugin_meta__ = PluginMetadata(
 )
 
 
-
 @scheduler.scheduled_job(
     "cron",
     id = 'fortnite',
@@ -41,9 +40,9 @@ __plugin_meta__ = PluginMetadata(
 async def _():
     try:
         await screenshot_shop_img()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f'商城更新失败: {e}')
     try:
         await screenshot_vb_img()
     except Exception:
-        pass
+        logger.warning(f'vb图更新失败: {e}')

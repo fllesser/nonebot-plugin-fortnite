@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from nonebot import get_plugin_config, require
+from nonebot import get_plugin_config
 
 from pathlib import Path
 import nonebot_plugin_localstore as store
