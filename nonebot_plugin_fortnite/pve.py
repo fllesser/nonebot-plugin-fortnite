@@ -57,7 +57,7 @@ def combine_imgs():
         images = []
         combined_image = None
         image_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
-        for image_path in image_paths:
+        for img_path in image_paths:
             if img_path.exists():
                 images.append(Image.open(img_path))
         
