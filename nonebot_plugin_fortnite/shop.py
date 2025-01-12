@@ -42,7 +42,7 @@ async def screenshot_shop_img() -> Path:
             await page.goto(url)
 
             async def wait_for_load():
-                await page.wait_for_load_state('networkidle', timeout=60000)            
+                await page.wait_for_load_state('networkidle', timeout=90000)            
             
             async def scroll_page():
                 for _ in range(20):
