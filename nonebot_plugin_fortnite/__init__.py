@@ -1,11 +1,11 @@
 from nonebot import (
     require,
     get_driver, # @get_driver().on_startup 装饰启动时运行函数
-    get_bots,   # dict[str, BaseBot]
-    inherit_supported_adapters
+    get_bots   # dict[str, BaseBot]
 )
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
+from nonebot.plugin.load import inherit_supported_adapters
 
 require("nonebot_plugin_uninfo")
 require("nonebot_plugin_alconna")
