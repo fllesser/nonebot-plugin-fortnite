@@ -2,7 +2,7 @@ from nonebot import (
     require,
     get_driver, # @get_driver().on_startup 装饰启动时运行函数
     get_bots,   # dict[str, BaseBot]
-    get_plugin
+    inherit_supported_adapters
 )
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
@@ -25,7 +25,7 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters=get_plugin("nonebot_plugin_alconna").metadata.supported_adapters
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_uninfo")
 )
 
 
