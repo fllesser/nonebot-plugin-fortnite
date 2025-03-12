@@ -1,4 +1,4 @@
-from nonebot import require
+from nonebot import get_driver, require
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
@@ -7,12 +7,9 @@ require("nonebot_plugin_uninfo")
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_localstore")
-from nonebot_plugin_apscheduler import scheduler  # noqa: E402
+from nonebot_plugin_apscheduler import scheduler
 
-from .config import Config  # noqa: E402
-from .matcher import *  # noqa: E402, F403
-from .pve import screenshot_vb_img  # noqa: E402
-from .shop import screenshot_shop_img  # noqa: E402
+from .config import Config, data_dir
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -21,10 +18,12 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_uninfo"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_uninfo"),
 )
+
+from .pve import screenshot_vb_img, vb_file
+from .shop import screenshot_shop_img, shop_file
+from .stats import font_path, get_level, get_stats_image
 
 
 @scheduler.scheduled_job(
@@ -34,11 +33,125 @@ __plugin_meta__ = PluginMetadata(
     minute=5,
 )
 async def _():
+    logger.info("开始更新商城/VB图...")
     try:
         await screenshot_shop_img()
+        logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
     except Exception as e:
         logger.warning(f"商城更新失败: {e}")
     try:
         await screenshot_vb_img()
+        logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
     except Exception as e:
         logger.warning(f"vb图更新失败: {e}")
+
+
+@get_driver().on_startup
+async def _():
+    if not shop_file.exists():
+        try:
+            logger.info("检测到插件为第一次运行，开始更新商城...")
+            await screenshot_shop_img()
+            logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.warning(f"商城更新失败: {e}")
+    if not vb_file.exists():
+        try:
+            logger.info("检测到插件为第一次运行，开始更新vb图...")
+            await screenshot_vb_img()
+            logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.warning(f"vb图更新失败: {e}")
+    if not font_path.exists():
+        logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
+
+
+import re
+
+from arclet.alconna import Alconna, Args, Arparma
+from nonebot import on_command
+from nonebot.permission import SUPERUSER
+from nonebot_plugin_alconna import AlconnaMatcher, Match, on_alconna
+from nonebot_plugin_alconna.uniseg import Image, Text, UniMessage
+from nonebot_plugin_uninfo import Uninfo
+
+timewindow_prefix = ["生涯", ""]
+name_args = Args["name?", str]
+
+
+battle_pass_alc = on_alconna(Alconna(timewindow_prefix, "季卡", name_args))
+stats_alc = on_alconna(Alconna(timewindow_prefix, "战绩", name_args))
+
+
+@battle_pass_alc.handle()
+@stats_alc.handle()
+async def _(matcher: AlconnaMatcher, session: Uninfo, name: Match[str]):
+    if name.available:
+        matcher.set_path_arg("name", name.result)
+        return
+    # 获取群昵称
+    if not session.member or not session.member.nick:
+        return
+    pattern = r"(?:id:|id\s)(.+)"
+    if match := re.match(pattern, session.member.nick, re.IGNORECASE):
+        matcher.set_path_arg("name", match.group(1))
+
+
+name_prompt = UniMessage.template(
+    "{:At(user, $event.get_user_id())} 请发送游戏名称\n群昵称设置如下可快速查询:\n    id:name\n    ID name"
+)
+
+
+@battle_pass_alc.got_path("name", prompt=name_prompt)
+async def _(arp: Arparma, name: str):
+    header: str = arp.header_match.result
+    receipt = await UniMessage.text(f"正在查询 {name} 的{header}，请稍后...").send()
+    level_info = await get_level(name, header)
+    await UniMessage(Text(level_info)).send()
+    await receipt.recall(delay=1)
+
+
+@stats_alc.got_path("name", prompt=name_prompt)
+async def _(arp: Arparma, name: str):
+    header: str = arp.header_match.result
+    receipt = await UniMessage.text(f"正在查询 {name} 的{header}，请稍后...").send()
+    try:
+        res = await get_stats_image(name, header)
+    except Exception as e:
+        await UniMessage(Text(f"查询失败 | {e}")).finish()
+    await UniMessage(Image(path=res)).send()
+    await receipt.recall(delay=1)
+
+
+@on_command("商城").handle()
+async def _():
+    await UniMessage(Image(path=shop_file) + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")).send()
+
+
+@on_command("更新商城", permission=SUPERUSER).handle()
+async def _():
+    receipt = await UniMessage.text("正在更新商城，请稍后...").send()
+    try:
+        file = await screenshot_shop_img()
+        await UniMessage(Text("手动更新商城成功") + Image(path=file)).send()
+    except Exception as e:
+        await UniMessage(Text(f"手动更新商城失败 | {e}")).send()
+    finally:
+        await receipt.recall(delay=1)
+
+
+@on_command("vb图", aliases={"VB图"}).handle()
+async def _():
+    await UniMessage(Image(path=vb_file)).send()
+
+
+@on_command("更新vb图", permission=SUPERUSER).handle()
+async def _():
+    receipt = await UniMessage.text("正在更新vb图，请稍后...").send()
+    try:
+        file = await screenshot_vb_img()
+        await UniMessage(Text("手动更新 VB 图成功") + Image(path=file)).send()
+    except Exception as e:
+        await UniMessage(Text(f"手动更新 VB 图失败 | {e}")).send()
+    finally:
+        await receipt.recall(delay=1)
