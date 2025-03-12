@@ -1,9 +1,11 @@
 import asyncio
-from PIL import Image
 from pathlib import Path
+
 from nonebot.log import logger
-from playwright.async_api import async_playwright, Browser
-from .config import data_dir, cache_dir
+from PIL import Image
+from playwright.async_api import Browser, async_playwright
+
+from .config import cache_dir, data_dir
 
 vb_file = data_dir / "vb.png"
 hot_info_1_path = cache_dir / "hot_info_1.png"
