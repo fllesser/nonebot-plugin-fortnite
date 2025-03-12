@@ -9,7 +9,7 @@ require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_localstore")
 from nonebot_plugin_apscheduler import scheduler
 
-from .config import Config
+from .config import Config, data_dir
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -23,6 +23,7 @@ __plugin_meta__ = PluginMetadata(
 
 from .pve import screenshot_vb_img, vb_file
 from .shop import screenshot_shop_img, shop_file
+from .stats import font_path, get_level, get_stats_image
 
 
 @scheduler.scheduled_job(
@@ -32,12 +33,15 @@ from .shop import screenshot_shop_img, shop_file
     minute=5,
 )
 async def _():
+    logger.info("开始更新商城/VB图...")
     try:
         await screenshot_shop_img()
+        logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
     except Exception as e:
         logger.warning(f"商城更新失败: {e}")
     try:
         await screenshot_vb_img()
+        logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
     except Exception as e:
         logger.warning(f"vb图更新失败: {e}")
 
@@ -48,16 +52,18 @@ async def _():
         try:
             logger.info("检测到插件为第一次运行，开始更新商城...")
             await screenshot_shop_img()
-            logger.success("商城更新成功")
+            logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
         except Exception as e:
             logger.warning(f"商城更新失败: {e}")
     if not vb_file.exists():
         try:
             logger.info("检测到插件为第一次运行，开始更新vb图...")
             await screenshot_vb_img()
-            logger.success("vb图更新成功")
+            logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
         except Exception as e:
             logger.warning(f"vb图更新失败: {e}")
+    if not font_path.exists():
+        logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
 
 
 import re
@@ -68,8 +74,6 @@ from nonebot.permission import SUPERUSER
 from nonebot_plugin_alconna import AlconnaMatcher, Match, on_alconna
 from nonebot_plugin_alconna.uniseg import Image, Text, UniMessage
 from nonebot_plugin_uninfo import Uninfo
-
-from .stats import get_level, get_stats_image
 
 timewindow_prefix = ["生涯", ""]
 name_args = Args["name?", str]

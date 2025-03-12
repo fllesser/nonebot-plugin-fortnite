@@ -6,8 +6,6 @@ from fortnite_api import Client
 from fortnite_api.enums import StatsImageType, TimeWindow
 from fortnite_api.errors import FortniteAPIException
 import httpx
-from nonebot import get_driver
-from nonebot.log import logger
 from PIL import Image, ImageDraw, ImageFont
 
 from .config import cache_dir, data_dir, fconfig
@@ -62,12 +60,6 @@ async def get_stats_image(name: str, cmd_header: str) -> Path:
 
 
 font_path: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
-
-
-@get_driver().on_startup
-async def _():
-    if not font_path.exists():
-        logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
 
 
 async def get_stats_img_by_url(url: str, name: str) -> Path:
