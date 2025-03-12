@@ -36,4 +36,4 @@ jobs:
 
     - name: Run all tests
       run: |
-        uv pytest -v -s
+        python -m pytest -v -s
