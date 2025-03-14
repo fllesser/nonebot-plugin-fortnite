@@ -93,8 +93,8 @@ async def _(matcher: AlconnaMatcher, session: Uninfo, name: Match[str]):
     if not session.member or not session.member.nick:
         return
     pattern = r"(?:id:|id\s)(.+)"
-    if match := re.match(pattern, session.member.nick, re.IGNORECASE):
-        matcher.set_path_arg("name", match.group(1))
+    if matched := re.match(pattern, session.member.nick, re.IGNORECASE):
+        matcher.set_path_arg("name", matched.group(1))
 
 
 name_prompt = UniMessage.template(

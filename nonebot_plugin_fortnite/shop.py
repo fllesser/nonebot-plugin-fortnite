@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
 
-from playwright.async_api import Browser, async_playwright
+from playwright.async_api import async_playwright
 
 from .config import data_dir
 
@@ -26,30 +26,25 @@ async def screenshot_shop_img() -> Path:
         "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
         "Cookie": "_sharedid=f02028dd-dce2-4b07-bba9-301d54e68dbd; _sharedid_cst=zix7LPQsHA%3D%3D; _lr_env_src_ats=false; hb_insticator_uid=799b5897-b5a3-48c4-a46f-8bb8bf9082ac",  # noqa: E501
     }
-    browser: Browser | None = None
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context(extra_http_headers=headers)
-            page = await context.new_page()
-            # page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
-            await page.add_style_tag(content="* { transition: none !important; animation: none !important; }")
-            await page.goto(url)
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        context = await browser.new_context(extra_http_headers=headers)
+        page = await context.new_page()
+        # page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
+        await page.add_style_tag(content="* { transition: none !important; animation: none !important; }")
+        await page.goto(url)
 
-            async def wait_for_load():
-                await page.wait_for_load_state("networkidle", timeout=90000)
+        async def wait_for_load():
+            await page.wait_for_load_state("networkidle", timeout=90000)
 
-            async def scroll_page():
-                for _ in range(20):
-                    await page.evaluate("""() => {
-                        window.scrollBy(0, document.body.scrollHeight / 20);
-                    }""")
-                    await asyncio.sleep(1)  # 等待1秒以加载内容
+        async def scroll_page():
+            for _ in range(20):
+                await page.evaluate("""() => {
+                    window.scrollBy(0, document.body.scrollHeight / 20);
+                }""")
+                await asyncio.sleep(1)  # 等待1秒以加载内容
 
-            await asyncio.gather(wait_for_load(), scroll_page())
+        await asyncio.gather(wait_for_load(), scroll_page())
 
-            await page.screenshot(path=shop_file, full_page=True)
-            return shop_file
-    finally:
-        if browser is not None:
-            await browser.close()
+        await page.screenshot(path=shop_file, full_page=True)
+        return shop_file
