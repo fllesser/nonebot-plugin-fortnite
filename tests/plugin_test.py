@@ -27,5 +27,7 @@ def make_onebot_msg(message: Message) -> GroupMessageEvent:
 
 
 @pytest.mark.asyncio
-async def test_pip(app: App):
-    pass
+async def test_load_plugin(app: App):
+    from nonebot import require
+
+    assert require("nonebot_plugin_fortnite")

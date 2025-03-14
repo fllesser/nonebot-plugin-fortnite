@@ -3,7 +3,7 @@ from pathlib import Path
 
 from nonebot.log import logger
 from PIL import Image
-from playwright.async_api import Browser, async_playwright
+from playwright.async_api import async_playwright
 
 from .config import cache_dir, data_dir
 
@@ -16,42 +16,36 @@ hot_info_2_path = cache_dir / "hot_info_2.png"
 async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"
 
-    browser: Browser | None = None
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            await page.goto(url)
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto(url)
 
-            # 截图函数，超时则跳过
-            async def take_screenshot(locator, path):
-                try:
-                    # 检查元素内容是否为空
-                    content = await locator.inner_html()
-                    if content.strip():  # 如果内容不为空
-                        await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
-                    else:
-                        logger.warning(f"Locator for {path.name} is empty.")
-                except Exception:
-                    pass
+        # 截图函数，超时则跳过
+        async def take_screenshot(locator, path):
+            try:
+                # 检查元素内容是否为空
+                content = await locator.inner_html()
+                if content.strip():  # 如果内容不为空
+                    await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
+                else:
+                    logger.warning(f"Locator for {path.name} is empty.")
+            except Exception:
+                pass
 
-            # 截取第一个 <div class="hot-info">
-            hot_info_1 = page.locator("div.hot-info").nth(0)
-            await take_screenshot(hot_info_1, hot_info_1_path)
+        # 截取第一个 <div class="hot-info">
+        hot_info_1 = page.locator("div.hot-info").nth(0)
+        await take_screenshot(hot_info_1, hot_info_1_path)
 
-            # 截取 <div class="container hidden-xs">
-            container_hidden_xs = page.locator("div.container.hidden-xs")
-            await take_screenshot(container_hidden_xs, container_hidden_xs_path)
+        # 截取 <div class="container hidden-xs">
+        container_hidden_xs = page.locator("div.container.hidden-xs")
+        await take_screenshot(container_hidden_xs, container_hidden_xs_path)
 
-            # 截取第二个 <div class="hot-info">
-            hot_info_2 = page.locator("div.hot-info").nth(1)
-            await take_screenshot(hot_info_2, hot_info_2_path)
+        # 截取第二个 <div class="hot-info">
+        hot_info_2 = page.locator("div.hot-info").nth(1)
+        await take_screenshot(hot_info_2, hot_info_2_path)
 
-            combine_imgs()
-    finally:
-        if browser:
-            await browser.close()
-
+    combine_imgs()
     return vb_file
 
 
@@ -87,3 +81,17 @@ def combine_imgs():
             img_path.unlink()
         if combined_image:
             combined_image.close()
+
+
+async def screenshop_fornitedb() -> Path:
+    url = "https://fortnitedb.com"
+    fortnitedb_file = data_dir / "fortnitedb.png"
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto(url)
+        # 等待加载结束，截图
+        await page.wait_for_load_state("networkidle")
+        await page.screenshot(path=fortnitedb_file)
+        await browser.close()
+    return fortnitedb_file
