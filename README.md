@@ -1,13 +1,8 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/fllesser/nonebot-plugin-template/blob/master/.docs/NoneBotPlugin.svg" width="380" height="177" alt="NoneBotPluginLogo"></a>
-</div>
+    <a href="https://v2.nonebot.dev/store">
+    <img src="https://raw.githubusercontent.com/fllesser/nonebot-plugin-template/refs/heads/resource/.docs/NoneBotPlugin.svg" width="310" alt="logo"></a>
 
-<div align="center">
-
-# nonebot-plugin-fortnite
-
-_✨ NoneBot Fortnite Plguin ✨_
-
+## ✨ nonebot-plugin-fortnite ✨
 
 <a href="./LICENSE">
     <img src="https://img.shields.io/github/license/fllesser/nonebot-plugin-fortnite.svg" alt="license">
@@ -15,7 +10,7 @@ _✨ NoneBot Fortnite Plguin ✨_
 <a href="https://pypi.python.org/pypi/nonebot-plugin-fortnite">
     <img src="https://img.shields.io/pypi/v/nonebot-plugin-fortnite.svg" alt="pypi">
 </a>
-<img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="python">
+<img src="https://img.shields.io/badge/python-3.10|3.11|3.12|3.13-blue.svg" alt="python">
 
 </div>
 
@@ -72,17 +67,17 @@ _✨ NoneBot Fortnite Plguin ✨_
 
 在 nonebot2 项目的`.env`文件中添加下表中的必填配置
 
-| 配置项 | 必填 | 默认值 | 说明 |
-|:-----:|:----:|:----:|:----:|
-| fortnite_api_key | 是 | '' | api-key |
+|      配置项      | 必填  | 默认值 |  说明   |
+| :--------------: | :---: | :----: | :-----: |
+| fortnite_api_key |  是   |   ''   | api-key |
 
 ## 🎉 使用
 ### 指令表
-| 指令 | 权限 | 需要@ | 范围 | 说明 |
-|:-----:|:----:|:----:|:----:|:----:|
-| [生涯]战绩 | - | 否 | - | 顾名思义 |
-| [生涯]季卡 | - | 否 | - | 顾名思义 |
-| 商城 | - | 否 | - | 顾名思义 |
-| vb图 | - | 否 | - | 顾名思义 |
-| 更新商城 | 主人 | 否 | - | 顾名思义 |
-| 更新vb图 | 主人 | 否 | - | 顾名思义 |
+|    指令    | 权限  | 需要@ | 范围  |   说明   |
+| :--------: | :---: | :---: | :---: | :------: |
+| [生涯]战绩 |   -   |  否   |   -   | 顾名思义 |
+| [生涯]季卡 |   -   |  否   |   -   | 顾名思义 |
+|    商城    |   -   |  否   |   -   | 顾名思义 |
+|    vb图    |   -   |  否   |   -   | 顾名思义 |
+|  更新商城  | 主人  |  否   |   -   | 顾名思义 |
+|  更新vb图  | 主人  |  否   |   -   | 顾名思义 |
