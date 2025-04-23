@@ -104,7 +104,9 @@ keep-runtime-typing = true
 
 [tool.pyright]
 executionEnvironments = [
-    { root = "./tests", extraPaths = ["./src",] },
+    { root = "./tests", extraPaths = [
+        "./src",
+    ] },
     { root = "./src" },
 ]
 pythonVersion = "3.10"
