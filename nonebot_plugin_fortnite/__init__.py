@@ -63,7 +63,24 @@ async def _():
         except Exception as e:
             logger.warning(f"vb图更新失败: {e}")
     if not font_path.exists():
-        logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
+        # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
+        import aiofiles
+        import aiohttp
+
+        try:
+            url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=60)) as session:
+                async with session.get(url) as response:
+                    response.raise_for_status()
+                    font_data = await response.read()
+
+            async with aiofiles.open(font_path, "wb") as f:
+                await f.write(font_data)
+
+            logger.success(f"字体 {font_path.name} 下载成功，文件大小: {font_path.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.error(f"字体下载失败: {e}")
+            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
 
 
 import re
