@@ -1,4 +1,4 @@
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
 from nonebug import App
 import pytest
 
@@ -37,7 +37,6 @@ async def test_load():
 async def test_vb_img(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
-    from nonebot.adapters.onebot.v11 import MessageSegment
 
     from nonebot_plugin_fortnite import vb_file, vb_matcher
 
@@ -57,7 +56,6 @@ async def test_vb_img(app: App):
 async def test_shop_img(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
-    from nonebot.adapters.onebot.v11 import MessageSegment
 
     from nonebot_plugin_fortnite import shop_file, shop_matcher
 
@@ -69,7 +67,14 @@ async def test_shop_img(app: App):
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         for msg in msgs:
             ctx.receive_event(bot, msg)
-            ctx.should_call_send(msg, Message(MessageSegment.image(shop_file)), result=None, bot=bot)
+            ctx.should_call_send(
+                msg,
+                Message(
+                    MessageSegment.image(shop_file) + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
+                ),
+                result=None,
+                bot=bot,
+            )
             ctx.should_finished()
 
 
@@ -77,7 +82,6 @@ async def test_shop_img(app: App):
 async def test_stats(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
-    from nonebot.adapters.onebot.v11 import MessageSegment
 
     from nonebot_plugin_fortnite import stats_alc
     from nonebot_plugin_fortnite.config import fconfig
