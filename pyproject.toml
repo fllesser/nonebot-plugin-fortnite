@@ -20,8 +20,7 @@ dependencies = [
     "nonebot-plugin-apscheduler>=0.5.0,<1.0.0",
     "fortnite-api[speed]>=3.2.1,<4.0.0",
 ]
-[tool.nonebot]
-plugins = ["nonebot_plugin_fortnite"]
+
 
 [dependency-groups]
 dev = [
@@ -37,10 +36,23 @@ test = [
     "pytest-asyncio>=0.26.0,<1.0.0",
 ]
 
+[tool.nonebot]
+plugin-dirs = ["src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
+pythonpath = ["src"]
+addopts = [
+    "-v",               # 详细输出
+    "-s",               # 显示打印信息
+    "--tb=short",       # 简短的错误回溯
+    "-ra",              # 显示所有测试结果摘要
+    "--strict-markers", # 严格标记模式
+    # "--doctest-modules", # 运行文档测试
+    "--import-mode=prepend", # 导入模式
+]
+
 
 [tool.ruff]
 line-length = 120
@@ -91,15 +103,13 @@ keep-runtime-typing = true
 
 
 [tool.pyright]
+executionEnvironments = [
+    { root = "./tests", extraPaths = ["./src",] },
+    { root = "./src" },
+]
 pythonVersion = "3.10"
 pythonPlatform = "All"
 defineConstant = { PYDANTIC_V2 = true }
-executionEnvironments = [
-    { root = "./tests", extraPaths = [
-        "./",
-    ] },
-    { root = "./" },
-]
 typeCheckingMode = "standard"
 reportShadowedImports = false
 disableBytesTypePromotions = true
