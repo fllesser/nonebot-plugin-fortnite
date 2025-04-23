@@ -47,7 +47,7 @@ async def _():
 
 
 @get_driver().on_startup
-async def _():
+async def check_files():
     if not shop_file.exists():
         try:
             logger.info("检测到插件为第一次运行，开始更新商城...")

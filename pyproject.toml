@@ -42,7 +42,7 @@ plugin-dirs = ["src"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
-pythonpath = [".", "src", "tests"]
+pythonpath = ["src"]
 addopts = [
     "-v",               # 详细输出
     "-s",               # 显示打印信息
@@ -103,15 +103,13 @@ keep-runtime-typing = true
 
 
 [tool.pyright]
+executionEnvironments = [
+    { root = "./tests", extraPaths = ["./src",] },
+    { root = "./src" },
+]
 pythonVersion = "3.10"
 pythonPlatform = "All"
 defineConstant = { PYDANTIC_V2 = true }
-executionEnvironments = [
-    { root = "./tests", extraPaths = [
-        "./",
-    ] },
-    { root = "./" },
-]
 typeCheckingMode = "standard"
 reportShadowedImports = false
 disableBytesTypePromotions = true
