@@ -80,9 +80,13 @@ async def test_stats(app: App):
     from nonebot.adapters.onebot.v11 import MessageSegment
 
     from nonebot_plugin_fortnite import stats_alc
+    from nonebot_plugin_fortnite.config import fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
 
-    texts = ["/战绩 红桃QAQ", "/生涯战绩 红桃QAQ"]
+    if fconfig.fortnite_api_key == "":
+        pytest.skip("api_key 未设置，跳过测试")
+
+    texts = ["战绩 红桃QAQ", "生涯战绩 红桃QAQ"]
     msgs = [make_onebot_msg(Message(text)) for text in texts]
 
     async with app.test_matcher(stats_alc) as ctx:
@@ -93,3 +97,10 @@ async def test_stats(app: App):
             stats_file = await get_stats_image("红桃QAQ", "生涯")
             ctx.should_call_send(msg, Message(MessageSegment.image(stats_file)), result=None, bot=bot)
             ctx.should_finished()
+
+
+@pytest.mark.asyncio
+async def test_check_font():
+    from nonebot_plugin_fortnite.stats import check_font_file
+
+    assert await check_font_file()
