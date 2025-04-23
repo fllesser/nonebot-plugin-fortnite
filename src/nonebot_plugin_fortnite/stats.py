@@ -62,6 +62,35 @@ async def get_stats_image(name: str, cmd_header: str) -> Path:
 font_path: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
 
 
+async def check_font_file() -> bool:
+    from nonebot import logger
+
+    if not font_path.exists():
+        # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
+        import aiofiles
+        import httpx
+
+        url = (
+            "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
+        )
+        logger.info(f"字体文件不存在，开始从 {url} 下载字体...")
+        try:
+            async with httpx.AsyncClient(timeout=60) as client:
+                response = await client.get(url)
+            response.raise_for_status()
+            font_data = response.content
+
+            async with aiofiles.open(font_path, "wb") as f:
+                await f.write(font_data)
+
+            logger.success(f"字体 {font_path.name} 下载成功，文件大小: {font_path.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.error(f"字体下载失败: {e}")
+            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
+            return False
+    return True
+
+
 async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
@@ -71,7 +100,7 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
     async with aiofiles.open(file, "wb") as f:
         await f.write(resp.content)
     # 如果不包含中文名，返回原图
-    if not font_path.exists() or not contains_chinese(name):
+    if not (await check_font_file()) or not contains_chinese(name):
         return file
 
     with Image.open(file) as img:

@@ -1,4 +1,4 @@
-from nonebot import get_driver, require
+from nonebot import require
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
@@ -9,7 +9,7 @@ require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_localstore")
 from nonebot_plugin_apscheduler import scheduler
 
-from .config import Config, data_dir
+from .config import Config
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -23,7 +23,7 @@ __plugin_meta__ = PluginMetadata(
 
 from .pve import screenshot_vb_img, vb_file
 from .shop import screenshot_shop_img, shop_file
-from .stats import font_path, get_level, get_stats_image
+from .stats import get_level, get_stats_image
 
 
 @scheduler.scheduled_job(
@@ -44,46 +44,6 @@ async def _():
         logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
     except Exception as e:
         logger.warning(f"vb图更新失败: {e}")
-
-
-@get_driver().on_startup
-async def check_files():
-    if not shop_file.exists():
-        logger.info("商城图不存在, 开始更新商城...")
-        try:
-            await screenshot_shop_img()
-            logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
-        except Exception as e:
-            logger.warning(f"商城更新失败: {e}")
-    if not vb_file.exists():
-        logger.info("vb 图不存在, 开始更新vb图...")
-        try:
-            await screenshot_vb_img()
-            logger.success(f"vb图更新成功, 文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
-        except Exception as e:
-            logger.warning(f"vb图更新失败: {e}")
-    if not font_path.exists():
-        # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
-        import aiofiles
-        import httpx
-
-        url = (
-            "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
-        )
-        logger.info(f"字体文件不存在，开始从 {url} 下载字体...")
-        try:
-            async with httpx.AsyncClient(timeout=60) as client:
-                response = await client.get(url)
-            response.raise_for_status()
-            font_data = response.content
-
-            async with aiofiles.open(font_path, "wb") as f:
-                await f.write(font_data)
-
-            logger.success(f"字体 {font_path.name} 下载成功，文件大小: {font_path.stat().st_size / 1024 / 1024:.2f} MB")
-        except Exception as e:
-            logger.error(f"字体下载失败: {e}")
-            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
 
 
 import re
@@ -143,8 +103,18 @@ async def _(arp: Arparma, name: str):
     await receipt.recall(delay=1)
 
 
-@on_command("商城").handle()
+shop_matcher = on_command("商城", aliases={"商城图"})
+
+
+@shop_matcher.handle()
 async def _():
+    if not shop_file.exists():
+        logger.info("商城图不存在, 开始更新商城...")
+        try:
+            await screenshot_shop_img()
+            logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.warning(f"商城更新失败: {e}")
     await UniMessage(Image(path=shop_file) + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")).send()
 
 
@@ -160,8 +130,18 @@ async def _():
         await receipt.recall(delay=1)
 
 
-@on_command("vb图", aliases={"VB图"}).handle()
+vb_matcher = on_command("vb图", aliases={"VB图"})
+
+
+@vb_matcher.handle()
 async def _():
+    if not vb_file.exists():
+        logger.info("vb 图不存在, 开始更新vb图...")
+        try:
+            await screenshot_vb_img()
+            logger.success(f"vb图更新成功, 文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.warning(f"vb图更新失败: {e}")
     await UniMessage(Image(path=vb_file)).send()
 
 
