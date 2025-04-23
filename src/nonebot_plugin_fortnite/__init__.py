@@ -49,17 +49,17 @@ async def _():
 @get_driver().on_startup
 async def check_files():
     if not shop_file.exists():
+        logger.info("商城图不存在, 开始更新商城...")
         try:
-            logger.info("检测到插件为第一次运行，开始更新商城...")
             await screenshot_shop_img()
             logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
         except Exception as e:
             logger.warning(f"商城更新失败: {e}")
     if not vb_file.exists():
+        logger.info("vb 图不存在, 开始更新vb图...")
         try:
-            logger.info("检测到插件为第一次运行，开始更新vb图...")
             await screenshot_vb_img()
-            logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
+            logger.success(f"vb图更新成功, 文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
         except Exception as e:
             logger.warning(f"vb图更新失败: {e}")
     if not font_path.exists():
@@ -67,8 +67,11 @@ async def check_files():
         import aiofiles
         import httpx
 
+        url = (
+            "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
+        )
+        logger.info(f"字体文件不存在，开始从 {url} 下载字体...")
         try:
-            url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
             async with httpx.AsyncClient(timeout=60) as client:
                 response = await client.get(url)
             response.raise_for_status()
