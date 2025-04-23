@@ -65,14 +65,14 @@ async def _():
     if not font_path.exists():
         # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
         import aiofiles
-        import aiohttp
+        import httpx
 
         try:
             url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=60)) as session:
-                async with session.get(url) as response:
-                    response.raise_for_status()
-                    font_data = await response.read()
+            async with httpx.AsyncClient(timeout=60) as client:
+                response = await client.get(url)
+            response.raise_for_status()
+            font_data = response.content
 
             async with aiofiles.open(font_path, "wb") as f:
                 await f.write(font_data)
