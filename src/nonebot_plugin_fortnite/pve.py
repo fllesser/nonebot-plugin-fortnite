@@ -3,7 +3,7 @@ from pathlib import Path
 
 from nonebot.log import logger
 from PIL import Image
-from playwright.async_api import async_playwright
+from playwright.async_api import Locator, Route, async_playwright
 
 from .config import cache_dir, data_dir
 
@@ -18,15 +18,37 @@ async def screenshot_vb_img() -> Path:
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        context = await browser.new_context()
+
+        # 拦截广告
+        async def ad_block_handler(route: Route):
+            ad_domains = [
+                "googlesyndication.com",
+                "doubleclick.net",
+                "adnxs.com",
+                "google-analytics.com",
+                "facebook.com",
+                "amazon-adsystem.com",
+                "adform.net",
+                "googleadservices.com",
+                "doubleclick.net",
+            ]
+            if any(ad_domain in route.request.url for ad_domain in ad_domains):
+                await route.abort()
+            else:
+                await route.continue_()
+
+        await context.route("**/*", ad_block_handler)
+
+        page = await context.new_page()
         await page.goto(url)
 
         # 截图函数，超时则跳过
-        async def take_screenshot(locator, path):
+        async def take_screenshot(locator: Locator, path: Path) -> None:
             try:
                 # 检查元素内容是否为空
                 content = await locator.inner_html()
-                if content.strip():  # 如果内容不为空
+                if content.strip():
                     await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
                 else:
                     logger.warning(f"Locator for {path.name} is empty.")
@@ -83,7 +105,7 @@ def combine_imgs():
             combined_image.close()
 
 
-async def screenshop_fornitedb() -> Path:
+async def screenshot_fortnitedb() -> Path:
     url = "https://fortnitedb.com"
     fortnitedb_file = data_dir / "fortnitedb.png"
     async with async_playwright() as p:
