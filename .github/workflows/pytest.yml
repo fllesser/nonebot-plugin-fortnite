@@ -33,7 +33,7 @@ jobs:
 
     - name: Install playwright chromium
       run: |
-        playwright install chromium
+        uv run playwright install chromium
 
     - name: Run all tests
       run: |
