@@ -91,15 +91,18 @@ async def test_stats(app: App):
         pytest.skip("api_key 未设置，跳过测试")
 
     texts = ["战绩 红桃QAQ", "生涯战绩 红桃QAQ"]
-    msgs = [make_onebot_msg(Message(text)) for text in texts]
+    msg_events = [make_onebot_msg(Message(text)) for text in texts]
 
     async with app.test_matcher(stats_alc) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        for msg in msgs:
-            ctx.receive_event(bot, msg)
+        for msg_event in msg_events:
+            ctx.receive_event(bot, msg_event)
             stats_file = await get_stats_image("红桃QAQ", "生涯")
-            ctx.should_call_send(msg, Message(MessageSegment.image(stats_file)), result=None, bot=bot)
+            ctx.should_call_send(
+                msg_event, Message(MessageSegment.text("正在查询红桃QAQ的战绩，请稍后...")), result=None, bot=bot
+            )
+            ctx.should_call_send(msg_event, Message(MessageSegment.image(stats_file)), result=None, bot=bot)
             ctx.should_finished()
 
 
