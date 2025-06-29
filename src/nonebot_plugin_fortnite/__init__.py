@@ -31,6 +31,7 @@ from .stats import get_level, get_stats_image
     id="fortnite",
     hour=8,
     minute=5,
+    misfire_grace_time=300,
 )
 async def _():
     logger.info("开始更新商城/VB图...")
