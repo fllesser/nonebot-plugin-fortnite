@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-fortnite"
-version = "0.3.2"
+version = "0.3.3"
 description = "堡垒之夜插件"
 authors = [{ name = "fllesser", email = "fllessive@gmail.com" }]
 readme = "README.md"
@@ -11,7 +11,7 @@ dependencies = [
     "httpx>=0.27.0,<1.0.0",
     "aiofiles>=24.1.0",
     "aiohttp>=3.12.15,<4.0.0",
-    "pillow>=11.3.0",
+    "pillow>=11.0.0",
     "playwright>=1.54.0,<2.0.0",
     "nonebot2>=2.4.3,<3.0.0",
     "nonebot-plugin-uninfo>=0.9.0,<1.0.0",
