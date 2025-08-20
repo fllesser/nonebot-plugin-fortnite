@@ -50,7 +50,7 @@ async def _():
 import re
 
 from arclet.alconna import Alconna, Args, Arparma
-from nonebot import on_command
+from nonebot import on_startswith
 from nonebot.permission import SUPERUSER
 from nonebot_plugin_alconna import AlconnaMatcher, Match, on_alconna
 from nonebot_plugin_alconna.uniseg import Image, Text, UniMessage
@@ -104,7 +104,7 @@ async def _(arp: Arparma, name: str):
     await receipt.recall(delay=1)
 
 
-shop_matcher = on_command("商城", aliases={"商城图"})
+shop_matcher = on_startswith("商城")
 
 
 @shop_matcher.handle()
@@ -119,7 +119,7 @@ async def _():
     await UniMessage(Image(path=shop_file) + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")).send()
 
 
-@on_command("更新商城", permission=SUPERUSER).handle()
+@on_startswith("更新商城", permission=SUPERUSER).handle()
 async def _():
     receipt = await UniMessage.text("正在更新商城，请稍后...").send()
     try:
@@ -131,7 +131,7 @@ async def _():
         await receipt.recall(delay=1)
 
 
-vb_matcher = on_command("vb图", aliases={"VB图"})
+vb_matcher = on_startswith(("vb图", "VB图", "Vb图"))
 
 
 @vb_matcher.handle()
@@ -146,7 +146,7 @@ async def _():
     await UniMessage(Image(path=vb_file)).send()
 
 
-@on_command("更新vb图", permission=SUPERUSER).handle()
+@on_startswith("更新vb图", permission=SUPERUSER).handle()
 async def _():
     receipt = await UniMessage.text("正在更新vb图，请稍后...").send()
     try:
