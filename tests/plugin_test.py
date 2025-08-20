@@ -40,7 +40,7 @@ async def test_vb_img(app: App):
 
     from nonebot_plugin_fortnite import vb_file, vb_matcher
 
-    texts = ["/vb图", "/VB图"]
+    texts = ["vb图", "VB图", "Vb图"]
     msgs = [make_onebot_msg(Message(text)) for text in texts]
 
     async with app.test_matcher(vb_matcher) as ctx:
@@ -59,7 +59,7 @@ async def test_shop_img(app: App):
 
     from nonebot_plugin_fortnite import shop_file, shop_matcher
 
-    texts = ["/商城", "/商城图"]
+    texts = ["商城", "商城。。。。"]
     msgs = [make_onebot_msg(Message(text)) for text in texts]
 
     async with app.test_matcher(shop_matcher) as ctx:
