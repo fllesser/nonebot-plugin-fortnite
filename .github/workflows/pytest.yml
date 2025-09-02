@@ -34,5 +34,8 @@ jobs:
     - name: Install Dependencies for test group
       run: uv sync --group test
 
+    - name: Playwright install chromium-headless
+      run: uv run playwright install chromium-headless-shell
+
     - name: Run all tests
       run: uv run pytest

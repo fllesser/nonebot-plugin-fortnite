@@ -67,11 +67,13 @@ async def test_shop_img(app: App):
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         for msg in msgs:
             ctx.receive_event(bot, msg)
+            # assert shop_file.exists()
+            should_send = (
+                MessageSegment.image(shop_file) + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
+            )
             ctx.should_call_send(
                 msg,
-                Message(
-                    MessageSegment.image(shop_file) + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
-                ),
+                Message(should_send),
                 result=None,
                 bot=bot,
             )
@@ -87,7 +89,7 @@ async def test_stats(app: App):
     from nonebot_plugin_fortnite.config import fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
 
-    if fconfig.fortnite_api_key == "":
+    if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
     texts = ["战绩 红桃QAQ", "生涯战绩 红桃QAQ"]
@@ -108,6 +110,21 @@ async def test_stats(app: App):
 
 @pytest.mark.asyncio
 async def test_check_font():
-    from nonebot_plugin_fortnite.stats import check_font_file
+    from nonebot_plugin_fortnite import check_font_file
 
     assert await check_font_file()
+
+
+@pytest.mark.asyncio
+async def test_fill_img_with_time():
+    import asyncio
+
+    from PIL import Image
+
+    from nonebot_plugin_fortnite.config import cache_dir
+    from nonebot_plugin_fortnite.pve import fill_img_with_time, vb_file
+    from nonebot_plugin_fortnite.utils import save_img
+
+    with Image.open(vb_file) as img:
+        await asyncio.to_thread(fill_img_with_time, img)
+        await save_img(img, cache_dir / "test_fill_img_with_time.png")

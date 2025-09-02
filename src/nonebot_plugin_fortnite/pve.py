@@ -1,11 +1,12 @@
 import asyncio
 from pathlib import Path
+import time
 
 from nonebot.log import logger
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from playwright.async_api import Locator, Route, async_playwright
 
-from .config import cache_dir, data_dir
+from .config import FONT_PATH, cache_dir, data_dir
 
 vb_file = data_dir / "vb.png"
 hot_info_1_path = cache_dir / "hot_info_1.png"
@@ -67,38 +68,59 @@ async def screenshot_vb_img() -> Path:
         hot_info_2 = page.locator("div.hot-info").nth(1)
         await take_screenshot(hot_info_2, hot_info_2_path)
 
-    combine_imgs()
+    await combine_imgs()
     return vb_file
 
 
-def combine_imgs():
+def fill_img_with_time(img: Image.Image):
+    draw = ImageDraw.Draw(img)
+    font_size = 26
+    font = ImageFont.truetype(FONT_PATH, font_size)
+    time_text = time.strftime("更新时间: %Y-%m-%d %H:%M:%S", time.localtime())
+    time_text_width = draw.textlength(time_text, font=font)
+    x = 1126 - time_text_width - 10
+    draw.text((x, 8), time_text, font=font, fill=(80, 80, 80))
+
+
+async def combine_imgs():
+    await asyncio.to_thread(_combine_imgs)
+
+
+def _combine_imgs():
     # 打开截图文件（如果存在）
     combined_image = None
     img_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
     img_paths = [i for i in img_paths if i.exists()]
     if not img_paths:
         raise Exception("所有选择器的截图文件均不存在")
-    images = []
+    # 先添加时间
     try:
-        images = [Image.open(img_path) for img_path in img_paths]
-        # 获取尺寸并创建新图像
-        widths, heights = zip(*(img.size for img in images))
-        total_width = max(widths)
-        total_height = sum(heights)
-        combined_image = Image.new("RGB", (total_width, total_height))
+        # images = [Image.open(img_path) for img_path in img_paths]
+        with (
+            Image.open(img_paths[0]) as img1,
+            Image.open(img_paths[1]) as img2,
+            Image.open(img_paths[2]) as img3,
+        ):
+            # 填充更新时间
+            fill_img_with_time(img1)
 
-        # 将截图粘贴到新图像中
-        y_offset = 0
-        for img in images:
-            combined_image.paste(img, (0, y_offset))
-            y_offset += img.height
+            images = [img1, img2, img3]
+            # 获取尺寸并创建新图像
+            widths, heights = zip(*(img.size for img in images))
+            total_width = max(widths)
+            total_height = sum(heights)
+            combined_image = Image.new("RGB", (total_width, total_height))
 
-        # 保存合并后的图像
-        combined_image.save(vb_file)
+            # 将截图粘贴到新图像中
+            y_offset = 0
+            for img in images:
+                combined_image.paste(img, (0, y_offset))
+                y_offset += img.height
+
+            # 保存合并后的图像
+            combined_image.save(vb_file)
     finally:
         # 关闭并删除所有截图文件
-        for img in images:
-            img.close()
         for img_path in img_paths:
             img_path.unlink()
         if combined_image:
