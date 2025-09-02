@@ -32,7 +32,7 @@ jobs:
         version: 'latest'
     
     - name: Install Dependencies for test group
-      run: uv sync --group test
+      run: uv sync --group test --no-dev --frozen
 
     - name: Playwright install chromium-headless
       run: uv run playwright install chromium-headless-shell

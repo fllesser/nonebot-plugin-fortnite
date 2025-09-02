@@ -938,7 +938,6 @@ dependencies = [
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
     { name = "pillow" },
-    { name = "playwright" },
 ]
 
 [package.dev-dependencies]
@@ -949,6 +948,7 @@ dev = [
     { name = "ruff" },
 ]
 test = [
+    { name = "nonebot-adapter-onebot" },
     { name = "nonebot2", extra = ["fastapi"] },
     { name = "nonebug" },
     { name = "pytest-asyncio" },
@@ -968,7 +968,6 @@ requires-dist = [
     { name = "nonebot-plugin-uninfo", specifier = ">=0.9.0,<1.0.0" },
     { name = "nonebot2", specifier = ">=2.4.3,<3.0.0" },
     { name = "pillow", specifier = ">=11.0.0" },
-    { name = "playwright", specifier = ">=1.54.0,<2.0.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -979,6 +978,7 @@ dev = [
     { name = "ruff", specifier = ">=0.12.11,<1.0.0" },
 ]
 test = [
+    { name = "nonebot-adapter-onebot", specifier = ">=2.4.6,<3.0.0" },
     { name = "nonebot2", extras = ["fastapi"], specifier = ">=2.4.3,<3.0.0" },
     { name = "nonebug", specifier = ">=0.4.3,<1.0.0" },
     { name = "pytest-asyncio", specifier = ">=1.1.0,<1.2.0" },
