@@ -110,6 +110,21 @@ async def test_stats(app: App):
 
 @pytest.mark.asyncio
 async def test_check_font():
-    from nonebot_plugin_fortnite.stats import check_font_file
+    from nonebot_plugin_fortnite import check_font_file
 
     assert await check_font_file()
+
+
+@pytest.mark.asyncio
+async def test_fill_img_with_time():
+    import asyncio
+
+    from PIL import Image
+
+    from nonebot_plugin_fortnite.config import cache_dir
+    from nonebot_plugin_fortnite.pve import fill_img_with_time, vb_file
+    from nonebot_plugin_fortnite.utils import save_img
+
+    img = Image.open(vb_file)
+    await asyncio.to_thread(fill_img_with_time, img)
+    await save_img(img, cache_dir / "test_fill_img_with_time.png")

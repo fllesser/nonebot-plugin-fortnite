@@ -3,7 +3,7 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright
 
-from .config import data_dir
+from .config import FONT_PATH, data_dir
 
 shop_file = data_dir / "shop.png"
 
@@ -47,23 +47,23 @@ async def screenshot_shop_img() -> Path:
         await asyncio.gather(wait_for_load(), scroll_page())
 
         await page.screenshot(path=shop_file, full_page=True)
-    await add_update_time()
+    await asyncio.to_thread(add_update_time)
     return shop_file
 
 
-async def add_update_time():
+def add_update_time():
     import time
 
     from PIL import Image, ImageDraw, ImageFont
 
-    from .stats import font_path
-
-    font = ImageFont.truetype(font_path, 100)
+    font = ImageFont.truetype(FONT_PATH, 100)
     img = Image.open(shop_file)
     draw = ImageDraw.Draw(img)
     # 先填充 rgb(47,49,54) 背景 1280 * 100
     draw.rectangle((0, 0, 1280, 280), fill=(47, 49, 54))
     # 1280 宽，19个数字居中 x 坐标
-    x = (1280 - 19 * 50) / 2
-    draw.text((x, 60), time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), font=font, fill=(255, 255, 255))
+    time_text = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    time_text_width = draw.textlength(time_text, font=font)
+    x = (1280 - time_text_width) / 2
+    draw.text((x, 60), time_text, font=font, fill=(255, 255, 255))
     img.save(shop_file)

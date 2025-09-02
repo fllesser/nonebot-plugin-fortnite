@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Any
 
@@ -6,10 +7,9 @@ from fortnite_api import Client
 from fortnite_api.enums import StatsImageType, TimeWindow
 from fortnite_api.errors import FortniteAPIException
 import httpx
-from nonebot import get_driver
 from PIL import Image, ImageDraw, ImageFont
 
-from .config import cache_dir, data_dir, fconfig
+from .config import FONT_PATH, cache_dir, fconfig
 
 API_KEY: str | None = fconfig.fortnite_api_key
 
@@ -60,39 +60,6 @@ async def get_stats_image(name: str, cmd_header: str) -> Path:
     return await get_stats_img_by_url(stats.image.url, stats.user.name)
 
 
-font_path: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
-
-
-@get_driver().on_startup
-async def check_font_file() -> bool:
-    from nonebot import logger
-
-    if not font_path.exists():
-        # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
-        import aiofiles
-        import httpx
-
-        url = (
-            "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
-        )
-        logger.info(f"字体文件不存在，开始从 {url} 下载字体...")
-        try:
-            async with httpx.AsyncClient(timeout=60) as client:
-                response = await client.get(url)
-            response.raise_for_status()
-            font_data = response.content
-
-            async with aiofiles.open(font_path, "wb") as f:
-                await f.write(font_data)
-
-            logger.success(f"字体 {font_path.name} 下载成功，文件大小: {font_path.stat().st_size / 1024 / 1024:.2f} MB")
-        except Exception as e:
-            logger.error(f"字体下载失败: {e}")
-            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
-            return False
-    return True
-
-
 async def get_stats_img_by_url(url: str, name: str) -> Path:
     file = cache_dir / f"{name}.png"
     async with httpx.AsyncClient() as client:
@@ -105,6 +72,17 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
     if not contains_chinese(name):
         return file
 
+    return await asyncio.to_thread(_process_image_with_chinese, file, name)
+
+
+def contains_chinese(text):
+    import re
+
+    pattern = re.compile(r"[\u4e00-\u9fff]")
+    return bool(pattern.search(text))
+
+
+def _process_image_with_chinese(file: Path, name: str):
     with Image.open(file) as img:
         draw = ImageDraw.Draw(img)
 
@@ -127,7 +105,7 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
         # 指定字体
         font_size = 36
         # hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
-        font = ImageFont.truetype(font_path, font_size)
+        font = ImageFont.truetype(FONT_PATH, font_size)
 
         # 计算字体坐标
         length = draw.textlength(name, font=font)
@@ -138,10 +116,3 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
         # 保存
         img.save(file)
         return file
-
-
-def contains_chinese(text):
-    import re
-
-    pattern = re.compile(r"[\u4e00-\u9fff]")
-    return bool(pattern.search(text))

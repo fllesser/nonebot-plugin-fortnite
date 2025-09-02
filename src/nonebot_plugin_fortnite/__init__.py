@@ -1,4 +1,4 @@
-from nonebot import require
+from nonebot import get_driver, require
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
@@ -24,6 +24,36 @@ __plugin_meta__ = PluginMetadata(
 from .pve import screenshot_vb_img, vb_file
 from .shop import screenshot_shop_img, shop_file
 from .stats import get_level, get_stats_image
+
+
+@get_driver().on_startup
+async def check_font_file() -> bool:
+    from .config import FONT_PATH, data_dir
+
+    if not FONT_PATH.exists():
+        # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
+        import aiofiles
+        import httpx
+
+        url = (
+            "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
+        )
+        logger.info(f"字体文件不存在，开始从 {url} 下载字体...")
+        try:
+            async with httpx.AsyncClient(timeout=60) as client:
+                response = await client.get(url)
+            response.raise_for_status()
+            font_data = response.content
+
+            async with aiofiles.open(FONT_PATH, "wb") as f:
+                await f.write(font_data)
+
+            logger.success(f"字体 {FONT_PATH.name} 下载成功，文件大小: {FONT_PATH.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception as e:
+            logger.error(f"字体下载失败: {e}")
+            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
+            return False
+    return True
 
 
 @scheduler.scheduled_job(
