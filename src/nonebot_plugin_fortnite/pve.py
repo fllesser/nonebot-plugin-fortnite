@@ -3,8 +3,9 @@ from pathlib import Path
 import time
 
 from nonebot.log import logger
+from nonebot_plugin_htmlrender import get_browser
 from PIL import Image, ImageDraw, ImageFont
-from playwright.async_api import Locator, Route, async_playwright
+from playwright.async_api import Locator, Route
 
 from .config import VB_FONT_PATH, cache_dir, data_dir
 
@@ -17,56 +18,55 @@ hot_info_2_path = cache_dir / "hot_info_2.png"
 async def screenshot_vb_img() -> Path:
     url = "https://freethevbucks.com/timed-missions"
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context()
+    browser = await get_browser(headless=True)
+    context = await browser.new_context()
 
-        # 拦截广告
-        async def ad_block_handler(route: Route):
-            ad_domains = [
-                "googlesyndication.com",
-                "doubleclick.net",
-                "adnxs.com",
-                "google-analytics.com",
-                "facebook.com",
-                "amazon-adsystem.com",
-                "adform.net",
-                "googleadservices.com",
-                "doubleclick.net",
-            ]
-            if any(ad_domain in route.request.url for ad_domain in ad_domains):
-                await route.abort()
+    # 拦截广告
+    async def ad_block_handler(route: Route):
+        ad_domains = [
+            "googlesyndication.com",
+            "doubleclick.net",
+            "adnxs.com",
+            "google-analytics.com",
+            "facebook.com",
+            "amazon-adsystem.com",
+            "adform.net",
+            "googleadservices.com",
+            "doubleclick.net",
+        ]
+        if any(ad_domain in route.request.url for ad_domain in ad_domains):
+            await route.abort()
+        else:
+            await route.continue_()
+
+    await context.route("**/*", ad_block_handler)
+
+    page = await context.new_page()
+    await page.goto(url)
+
+    # 截图函数，超时则跳过
+    async def take_screenshot(locator: Locator, path: Path) -> None:
+        try:
+            # 检查元素内容是否为空
+            content = await locator.inner_html()
+            if content.strip():
+                await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
             else:
-                await route.continue_()
+                logger.warning(f"Locator for {path.name} is empty.")
+        except Exception:
+            pass
 
-        await context.route("**/*", ad_block_handler)
+    # 截取第一个 <div class="hot-info">
+    hot_info_1 = page.locator("div.hot-info").nth(0)
+    await take_screenshot(hot_info_1, hot_info_1_path)
 
-        page = await context.new_page()
-        await page.goto(url)
+    # 截取 <div class="container hidden-xs">
+    container_hidden_xs = page.locator("div.container.hidden-xs")
+    await take_screenshot(container_hidden_xs, container_hidden_xs_path)
 
-        # 截图函数，超时则跳过
-        async def take_screenshot(locator: Locator, path: Path) -> None:
-            try:
-                # 检查元素内容是否为空
-                content = await locator.inner_html()
-                if content.strip():
-                    await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
-                else:
-                    logger.warning(f"Locator for {path.name} is empty.")
-            except Exception:
-                pass
-
-        # 截取第一个 <div class="hot-info">
-        hot_info_1 = page.locator("div.hot-info").nth(0)
-        await take_screenshot(hot_info_1, hot_info_1_path)
-
-        # 截取 <div class="container hidden-xs">
-        container_hidden_xs = page.locator("div.container.hidden-xs")
-        await take_screenshot(container_hidden_xs, container_hidden_xs_path)
-
-        # 截取第二个 <div class="hot-info">
-        hot_info_2 = page.locator("div.hot-info").nth(1)
-        await take_screenshot(hot_info_2, hot_info_2_path)
+    # 截取第二个 <div class="hot-info">
+    hot_info_2 = page.locator("div.hot-info").nth(1)
+    await take_screenshot(hot_info_2, hot_info_2_path)
 
     await combine_imgs()
     return vb_file
@@ -125,17 +125,3 @@ def _combine_imgs():
             img_path.unlink()
         if combined_image:
             combined_image.close()
-
-
-async def screenshot_fortnitedb() -> Path:
-    url = "https://fortnitedb.com"
-    fortnitedb_file = data_dir / "fortnitedb.png"
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
-        await page.goto(url)
-        # 等待加载结束，截图
-        await page.wait_for_load_state("networkidle")
-        await page.screenshot(path=fortnitedb_file)
-        await browser.close()
-    return fortnitedb_file
