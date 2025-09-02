@@ -72,17 +72,21 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
     if not contains_chinese(name):
         return file
 
-    return await asyncio.to_thread(_process_image_with_chinese, file, name)
+    return await process_image_with_chinese(file, name)
 
 
-def contains_chinese(text):
+def contains_chinese(text: str) -> bool:
     import re
 
     pattern = re.compile(r"[\u4e00-\u9fff]")
     return bool(pattern.search(text))
 
 
-def _process_image_with_chinese(file: Path, name: str):
+async def process_image_with_chinese(file: Path, name: str) -> Path:
+    return await asyncio.to_thread(_process_image_with_chinese, file, name)
+
+
+def _process_image_with_chinese(file: Path, name: str) -> Path:
     with Image.open(file) as img:
         draw = ImageDraw.Draw(img)
 

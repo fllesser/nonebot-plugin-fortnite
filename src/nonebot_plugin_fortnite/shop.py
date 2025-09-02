@@ -47,23 +47,27 @@ async def screenshot_shop_img() -> Path:
         await asyncio.gather(wait_for_load(), scroll_page())
 
         await page.screenshot(path=shop_file, full_page=True)
-    await asyncio.to_thread(add_update_time)
+    await add_update_time()
     return shop_file
 
 
-def add_update_time():
+async def add_update_time():
+    await asyncio.to_thread(_add_update_time)
+
+
+def _add_update_time():
     import time
 
     from PIL import Image, ImageDraw, ImageFont
 
     font = ImageFont.truetype(FONT_PATH, 100)
-    img = Image.open(shop_file)
-    draw = ImageDraw.Draw(img)
-    # 先填充 rgb(47,49,54) 背景 1280 * 100
-    draw.rectangle((0, 0, 1280, 280), fill=(47, 49, 54))
-    # 1280 宽，19个数字居中 x 坐标
-    time_text = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    time_text_width = draw.textlength(time_text, font=font)
-    x = (1280 - time_text_width) / 2
-    draw.text((x, 60), time_text, font=font, fill=(255, 255, 255))
-    img.save(shop_file)
+    with Image.open(shop_file) as img:
+        draw = ImageDraw.Draw(img)
+        # 先填充 rgb(47,49,54) 背景 1280 * 100
+        draw.rectangle((0, 0, 1280, 280), fill=(47, 49, 54))
+        # 1280 宽，19个数字居中 x 坐标
+        time_text = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        time_text_width = draw.textlength(time_text, font=font)
+        x = (1280 - time_text_width) / 2
+        draw.text((x, 60), time_text, font=font, fill=(255, 255, 255))
+        img.save(shop_file)

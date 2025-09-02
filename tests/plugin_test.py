@@ -125,6 +125,6 @@ async def test_fill_img_with_time():
     from nonebot_plugin_fortnite.pve import fill_img_with_time, vb_file
     from nonebot_plugin_fortnite.utils import save_img
 
-    img = Image.open(vb_file)
-    await asyncio.to_thread(fill_img_with_time, img)
-    await save_img(img, cache_dir / "test_fill_img_with_time.png")
+    with Image.open(vb_file) as img:
+        await asyncio.to_thread(fill_img_with_time, img)
+        await save_img(img, cache_dir / "test_fill_img_with_time.png")
