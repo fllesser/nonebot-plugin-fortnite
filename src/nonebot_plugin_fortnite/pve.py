@@ -6,7 +6,7 @@ from nonebot.log import logger
 from PIL import Image, ImageDraw, ImageFont
 from playwright.async_api import Locator, Route, async_playwright
 
-from .config import FONT_PATH, cache_dir, data_dir
+from .config import VB_FONT_PATH, cache_dir, data_dir
 
 vb_file = data_dir / "vb.png"
 hot_info_1_path = cache_dir / "hot_info_1.png"
@@ -72,14 +72,14 @@ async def screenshot_vb_img() -> Path:
     return vb_file
 
 
-def fill_img_with_time(img: Image.Image):
+def fill_img_with_time(img: Image.Image, width: int = 1126):
     draw = ImageDraw.Draw(img)
     font_size = 26
-    font = ImageFont.truetype(FONT_PATH, font_size)
-    time_text = time.strftime("更新时间: %Y-%m-%d %H:%M:%S", time.localtime())
+    font = ImageFont.truetype(VB_FONT_PATH, font_size)
+    time_text = time.strftime("Updated: %Y-%m-%d %H:%M:%S", time.localtime())
     time_text_width = draw.textlength(time_text, font=font)
-    x = 1126 - time_text_width - 10
-    draw.text((x, 8), time_text, font=font, fill=(80, 80, 80))
+    x = width - time_text_width - 10
+    draw.text((x, 12), time_text, font=font, fill=(80, 80, 80))
 
 
 async def combine_imgs():
@@ -102,13 +102,13 @@ def _combine_imgs():
             Image.open(img_paths[2]) as img3,
         ):
             # 填充更新时间
-            fill_img_with_time(img1)
-
             images = [img1, img2, img3]
             # 获取尺寸并创建新图像
             widths, heights = zip(*(img.size for img in images))
             total_width = max(widths)
             total_height = sum(heights)
+
+            fill_img_with_time(img1, total_width)
             combined_image = Image.new("RGB", (total_width, total_height))
 
             # 将截图粘贴到新图像中

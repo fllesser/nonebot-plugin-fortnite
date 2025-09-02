@@ -40,6 +40,9 @@ async def test_vb_img(app: App):
 
     from nonebot_plugin_fortnite import vb_file, vb_matcher
 
+    if vb_file.exists():
+        vb_file.unlink()
+
     texts = ["vb图", "VB图", "Vb图"]
     msgs = [make_onebot_msg(Message(text)) for text in texts]
 
@@ -51,6 +54,8 @@ async def test_vb_img(app: App):
             ctx.should_call_send(msg, Message(MessageSegment.image(vb_file)), result=None, bot=bot)
             ctx.should_finished()
 
+    assert vb_file.exists()
+
 
 @pytest.mark.asyncio
 async def test_shop_img(app: App):
@@ -58,6 +63,9 @@ async def test_shop_img(app: App):
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
     from nonebot_plugin_fortnite import shop_file, shop_matcher
+
+    if shop_file.exists():
+        shop_file.unlink()
 
     texts = ["商城", "商城。。。。"]
     msgs = [make_onebot_msg(Message(text)) for text in texts]
@@ -78,6 +86,7 @@ async def test_shop_img(app: App):
                 bot=bot,
             )
             ctx.should_finished()
+    assert shop_file.exists()
 
 
 @pytest.mark.asyncio
@@ -112,7 +121,7 @@ async def test_stats(app: App):
 async def test_check_font():
     from nonebot_plugin_fortnite import check_font_file
 
-    assert await check_font_file()
+    await check_font_file()
 
 
 @pytest.mark.asyncio

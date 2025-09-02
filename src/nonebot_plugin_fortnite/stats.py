@@ -9,7 +9,7 @@ from fortnite_api.errors import FortniteAPIException
 import httpx
 from PIL import Image, ImageDraw, ImageFont
 
-from .config import FONT_PATH, cache_dir, fconfig
+from .config import CHINESE_FONT_PATH, cache_dir, fconfig
 
 API_KEY: str | None = fconfig.fortnite_api_key
 
@@ -109,7 +109,7 @@ def _process_image_with_chinese(file: Path, name: str) -> Path:
         # 指定字体
         font_size = 36
         # hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
-        font = ImageFont.truetype(FONT_PATH, font_size)
+        font = ImageFont.truetype(CHINESE_FONT_PATH, font_size)
 
         # 计算字体坐标
         length = draw.textlength(name, font=font)
