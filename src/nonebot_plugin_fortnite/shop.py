@@ -2,6 +2,7 @@ import asyncio
 from pathlib import Path
 
 from nonebot_plugin_htmlrender import get_browser
+from playwright.async_api import BrowserContext
 
 from .config import GG_FONT_PATH, data_dir
 
@@ -10,8 +11,6 @@ shop_file = data_dir / "shop.png"
 
 async def screenshot_shop_img() -> Path:
     # url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
-    url = "https://fortnite.gg/shop"
-
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",  # noqa: E501
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",  # noqa: E501
@@ -24,10 +23,20 @@ async def screenshot_shop_img() -> Path:
         "sec-fetch-user": "?1",
         "sec-fetch-dest": "document",
         "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-        "Cookie": "_sharedid=f02028dd-dce2-4b07-bba9-301d54e68dbd; _sharedid_cst=zix7LPQsHA%3D%3D; _lr_env_src_ats=false; hb_insticator_uid=799b5897-b5a3-48c4-a46f-8bb8bf9082ac",  # noqa: E501
     }
     browser = await get_browser(headless=True)
     context = await browser.new_context(extra_http_headers=headers)
+
+    try:
+        await _screenshot_shop_img(context)
+    finally:
+        await context.close()
+    await add_update_time()
+    return shop_file
+
+
+async def _screenshot_shop_img(context: BrowserContext):
+    url = "https://fortnite.gg/shop"
     page = await context.new_page()
     # page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
     await page.add_style_tag(content="* { transition: none !important; animation: none !important; }")
@@ -46,8 +55,6 @@ async def screenshot_shop_img() -> Path:
     await asyncio.gather(wait_for_load(), scroll_page())
 
     await page.screenshot(path=shop_file, full_page=True)
-    await add_update_time()
-    return shop_file
 
 
 async def add_update_time():

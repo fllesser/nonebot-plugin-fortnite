@@ -5,7 +5,7 @@ import time
 from nonebot.log import logger
 from nonebot_plugin_htmlrender import get_browser
 from PIL import Image, ImageDraw, ImageFont
-from playwright.async_api import Locator, Route
+from playwright.async_api import BrowserContext, Locator, Route
 
 from .config import VB_FONT_PATH, cache_dir, data_dir
 
@@ -16,10 +16,19 @@ hot_info_2_path = cache_dir / "hot_info_2.png"
 
 
 async def screenshot_vb_img() -> Path:
-    url = "https://freethevbucks.com/timed-missions"
-
     browser = await get_browser(headless=True)
     context = await browser.new_context()
+
+    try:
+        await _screenshot_vb_img(context)
+    finally:
+        await context.close()
+    await combine_imgs()
+    return vb_file
+
+
+async def _screenshot_vb_img(context: BrowserContext):
+    url = "https://freethevbucks.com/timed-missions"
 
     # 拦截广告
     async def ad_block_handler(route: Route):
@@ -68,19 +77,6 @@ async def screenshot_vb_img() -> Path:
     hot_info_2 = page.locator("div.hot-info").nth(1)
     await take_screenshot(hot_info_2, hot_info_2_path)
 
-    await combine_imgs()
-    return vb_file
-
-
-def fill_img_with_time(img: Image.Image, width: int = 1126):
-    draw = ImageDraw.Draw(img)
-    font_size = 26
-    font = ImageFont.truetype(VB_FONT_PATH, font_size)
-    time_text = time.strftime("Updated: %Y-%m-%d %H:%M:%S", time.localtime())
-    time_text_width = draw.textlength(time_text, font=font)
-    x = width - time_text_width - 10
-    draw.text((x, 12), time_text, font=font, fill=(80, 80, 80))
-
 
 async def combine_imgs():
     await asyncio.to_thread(_combine_imgs)
@@ -125,3 +121,13 @@ def _combine_imgs():
             img_path.unlink()
         if combined_image:
             combined_image.close()
+
+
+def fill_img_with_time(img: Image.Image, width: int = 1126):
+    draw = ImageDraw.Draw(img)
+    font_size = 26
+    font = ImageFont.truetype(VB_FONT_PATH, font_size)
+    time_text = time.strftime("Updated: %Y-%m-%d %H:%M:%S", time.localtime())
+    time_text_width = draw.textlength(time_text, font=font)
+    x = width - time_text_width - 10
+    draw.text((x, 12), time_text, font=font, fill=(80, 80, 80))
