@@ -30,7 +30,7 @@ from .stats import get_level, get_stats_image
 async def check_font_file():
     from pathlib import Path
 
-    from .config import CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH, data_dir
+    from .config import CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH
 
     async def dwonload_font(path: Path):
         import aiofiles
@@ -51,7 +51,7 @@ async def check_font_file():
             logger.success(f"字体 {path.name} 下载成功，文件大小: {path.stat().st_size / 1024 / 1024:.2f} MB")
         except Exception:
             logger.exception("字体下载失败")
-            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
+            logger.warning(f"请前往仓库下载字体到 {path}")
 
     if not CHINESE_FONT_PATH.exists():
         await dwonload_font(CHINESE_FONT_PATH)
