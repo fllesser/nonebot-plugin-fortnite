@@ -14,4 +14,6 @@ fconfig: Config = get_plugin_config(Config)
 cache_dir: Path = store.get_plugin_cache_dir()
 data_dir: Path = store.get_plugin_data_dir()
 
-FONT_PATH: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
+CHINESE_FONT_PATH: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
+GG_FONT_PATH: Path = data_dir / "burbankbigregular-black.woff2"
+VB_FONT_PATH: Path = data_dir / "LuckiestGuy.woff"

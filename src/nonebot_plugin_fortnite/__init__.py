@@ -27,33 +27,38 @@ from .stats import get_level, get_stats_image
 
 
 @get_driver().on_startup
-async def check_font_file() -> bool:
-    from .config import FONT_PATH, data_dir
+async def check_font_file():
+    from pathlib import Path
 
-    if not FONT_PATH.exists():
-        # 下载 字体 githubraw https://github.com/fllesser/nonebot-plugin-fortnite/blob/master/fonts/SourceHanSansSC-Bold-2.otf
+    from .config import CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH
+
+    async def dwonload_font(path: Path):
         import aiofiles
         import httpx
 
-        url = (
-            "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/SourceHanSansSC-Bold-2.otf"
-        )
-        logger.info(f"字体文件不存在，开始从 {url} 下载字体...")
+        url_base = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/"
+        url = url_base + path.name
+        logger.info(f"字体文件 {path.name} 不存在，开始从 {url} 下载字体...")
         try:
             async with httpx.AsyncClient(timeout=60) as client:
                 response = await client.get(url)
             response.raise_for_status()
             font_data = response.content
 
-            async with aiofiles.open(FONT_PATH, "wb") as f:
+            async with aiofiles.open(path, "wb") as f:
                 await f.write(font_data)
 
-            logger.success(f"字体 {FONT_PATH.name} 下载成功，文件大小: {FONT_PATH.stat().st_size / 1024 / 1024:.2f} MB")
-        except Exception as e:
-            logger.error(f"字体下载失败: {e}")
-            logger.warning(f"请前往仓库下载字体到 {data_dir}/，否则战绩查询可能无法显示中文名称")
-            return False
-    return True
+            logger.success(f"字体 {path.name} 下载成功，文件大小: {path.stat().st_size / 1024 / 1024:.2f} MB")
+        except Exception:
+            logger.exception("字体下载失败")
+            logger.warning(f"请前往仓库下载字体到 {path}")
+
+    if not CHINESE_FONT_PATH.exists():
+        await dwonload_font(CHINESE_FONT_PATH)
+    if not GG_FONT_PATH.exists():
+        await dwonload_font(GG_FONT_PATH)
+    if not VB_FONT_PATH.exists():
+        await dwonload_font(VB_FONT_PATH)
 
 
 @scheduler.scheduled_job(

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright
 
-from .config import FONT_PATH, data_dir
+from .config import GG_FONT_PATH, data_dir
 
 shop_file = data_dir / "shop.png"
 
@@ -60,14 +60,14 @@ def _add_update_time():
 
     from PIL import Image, ImageDraw, ImageFont
 
-    font = ImageFont.truetype(FONT_PATH, 100)
+    font = ImageFont.truetype(GG_FONT_PATH, 88)
     with Image.open(shop_file) as img:
         draw = ImageDraw.Draw(img)
         # 先填充 rgb(47,49,54) 背景 1280 * 100
-        draw.rectangle((0, 0, 1280, 280), fill=(47, 49, 54))
+        draw.rectangle((0, 0, 1280, 270), fill=(47, 49, 54))
         # 1280 宽，19个数字居中 x 坐标
         time_text = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         time_text_width = draw.textlength(time_text, font=font)
         x = (1280 - time_text_width) / 2
-        draw.text((x, 60), time_text, font=font, fill=(255, 255, 255))
+        draw.text((x, 100), time_text, font=font, fill=(255, 255, 255))
         img.save(shop_file)
