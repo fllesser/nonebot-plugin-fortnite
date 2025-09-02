@@ -6,11 +6,12 @@ from fortnite_api import Client
 from fortnite_api.enums import StatsImageType, TimeWindow
 from fortnite_api.errors import FortniteAPIException
 import httpx
+from nonebot import get_driver
 from PIL import Image, ImageDraw, ImageFont
 
 from .config import cache_dir, data_dir, fconfig
 
-API_KEY: str = fconfig.fortnite_api_key
+API_KEY: str | None = fconfig.fortnite_api_key
 
 
 def handle_fortnite_api_exception(e: FortniteAPIException) -> str:
@@ -62,6 +63,7 @@ async def get_stats_image(name: str, cmd_header: str) -> Path:
 font_path: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
 
 
+@get_driver().on_startup
 async def check_font_file() -> bool:
     from nonebot import logger
 
@@ -100,7 +102,7 @@ async def get_stats_img_by_url(url: str, name: str) -> Path:
     async with aiofiles.open(file, "wb") as f:
         await f.write(resp.content)
     # 如果不包含中文名，返回原图
-    if not (await check_font_file()) or not contains_chinese(name):
+    if not contains_chinese(name):
         return file
 
     with Image.open(file) as img:

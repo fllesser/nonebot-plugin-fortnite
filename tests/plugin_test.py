@@ -67,11 +67,13 @@ async def test_shop_img(app: App):
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         for msg in msgs:
             ctx.receive_event(bot, msg)
+            # assert shop_file.exists()
+            should_send = (
+                MessageSegment.image(shop_file) + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
+            )
             ctx.should_call_send(
                 msg,
-                Message(
-                    MessageSegment.image(shop_file) + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
-                ),
+                Message(should_send),
                 result=None,
                 bot=bot,
             )
@@ -87,7 +89,7 @@ async def test_stats(app: App):
     from nonebot_plugin_fortnite.config import fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
 
-    if fconfig.fortnite_api_key == "":
+    if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
     texts = ["战绩 红桃QAQ", "生涯战绩 红桃QAQ"]

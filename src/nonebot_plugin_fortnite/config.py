@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class Config(BaseModel):
-    fortnite_api_key: str = ""
+    fortnite_api_key: str | None = None
 
 
 fconfig: Config = get_plugin_config(Config)
