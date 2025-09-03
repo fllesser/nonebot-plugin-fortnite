@@ -119,14 +119,19 @@ async def test_stats_matcher(app: App):
 
 @pytest.mark.asyncio
 async def test_stats_func():
-    from nonebot_plugin_fortnite.config import fconfig
+    import aiofiles
+
+    from nonebot_plugin_fortnite.config import cache_dir, fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
 
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
-    stats_file = await get_stats_image("红桃QAQ", "生涯")
-    assert stats_file.exists()
+    bytes_io = await get_stats_image("红桃QAQ", "生涯")
+    assert bytes_io is not None
+
+    async with aiofiles.open(cache_dir / "test_stats_image.png", "wb") as f:
+        await f.write(bytes_io.getvalue())
 
 
 @pytest.mark.asyncio

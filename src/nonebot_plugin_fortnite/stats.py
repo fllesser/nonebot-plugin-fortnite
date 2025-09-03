@@ -90,7 +90,7 @@ async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
 
 
 def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
-    with Image.open(bytes_io) as img:
+    with Image.open(bytes_io, formats=["PNG"]) as img:
         draw = ImageDraw.Draw(img)
 
         # 矩形区域的坐标
@@ -120,4 +120,10 @@ def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
         y = top + (bottom - top - font_size) / 2
         draw.text((x, y), name, fill="#fafafa", font=font)
 
-        return BytesIO(img.tobytes())
+        output_bytes = BytesIO()
+        # 保存处理后的图像到 BytesIO
+        img.save(output_bytes, format="PNG", optimize=True)
+        # 将指针重置到 BytesIO 对象的开头
+        output_bytes.seek(0)
+
+        return output_bytes
