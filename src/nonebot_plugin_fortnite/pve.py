@@ -3,9 +3,10 @@ from pathlib import Path
 import time
 
 from nonebot.log import logger
-from nonebot_plugin_htmlrender import get_browser
+from nonebot_plugin_htmlrender import get_new_page
+from nonebot_plugin_htmlrender.browser import Page
 from PIL import Image, ImageDraw, ImageFont
-from playwright.async_api import BrowserContext, Locator, Route
+from playwright.async_api import Locator, Route
 
 from .config import VB_FONT_PATH, cache_dir, data_dir
 
@@ -16,18 +17,15 @@ hot_info_2_path = cache_dir / "hot_info_2.png"
 
 
 async def screenshot_vb_img() -> Path:
-    browser = await get_browser(headless=True)
-    context = await browser.new_context()
-
-    try:
-        await _screenshot_vb_img(context)
-    finally:
-        await context.close()
+    # browser = await get_browser(headless=True)
+    # context = await browser.new_context()
+    async with get_new_page(device_scale_factor=1) as page:
+        await _screenshot_vb_img(page)
     await combine_imgs()
     return vb_file
 
 
-async def _screenshot_vb_img(context: BrowserContext):
+async def _screenshot_vb_img(page: Page):
     url = "https://freethevbucks.com/timed-missions"
 
     # 拦截广告
@@ -48,9 +46,8 @@ async def _screenshot_vb_img(context: BrowserContext):
         else:
             await route.continue_()
 
-    await context.route("**/*", ad_block_handler)
+    await page.route("**/*", ad_block_handler)
 
-    page = await context.new_page()
     await page.goto(url)
 
     # 截图函数，超时则跳过

@@ -37,8 +37,7 @@ async def check_font_file():
         import aiofiles
         import httpx
 
-        url_base = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/"
-        url = url_base + path.name
+        url = f"https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/fonts/{path.name}"
         logger.info(f"字体文件 {path.name} 不存在，开始从 {url} 下载字体...")
         try:
             async with httpx.AsyncClient(timeout=60) as client:
