@@ -73,13 +73,13 @@ async def _():
     try:
         await screenshot_shop_img()
         logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
-    except Exception as e:
-        logger.warning(f"商城更新失败: {e}")
+    except Exception:
+        logger.exception("商城更新失败")
     try:
         await screenshot_vb_img()
         logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
-    except Exception as e:
-        logger.warning(f"vb图更新失败: {e}")
+    except Exception:
+        logger.exception("vb图更新失败")
 
 
 import re
@@ -134,8 +134,11 @@ async def _(arp: Arparma, name: str):
     try:
         res = await get_stats_image(name, header)
     except Exception as e:
-        await UniMessage(Text(f"查询失败 | {e}")).finish()
-    await UniMessage(Image(path=res)).send()
+        if isinstance(e, ValueError):
+            await UniMessage(Text(str(e))).finish()
+        logger.exception("查询失败")
+        await UniMessage(Text("查询失败")).finish()
+    await UniMessage(Image(raw=res)).send()
     await receipt.recall(delay=1)
 
 
@@ -149,8 +152,8 @@ async def _():
         try:
             await screenshot_shop_img()
             logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
-        except Exception as e:
-            logger.warning(f"商城更新失败: {e}")
+        except Exception:
+            logger.exception("商城更新失败")
     await UniMessage(Image(path=shop_file) + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")).send()
 
 
@@ -160,8 +163,9 @@ async def _():
     try:
         file = await screenshot_shop_img()
         await UniMessage(Text("手动更新商城成功") + Image(path=file)).send()
-    except Exception as e:
-        await UniMessage(Text(f"手动更新商城失败 | {e}")).send()
+    except Exception:
+        logger.exception("手动更新商城失败")
+        await UniMessage(Text("手动更新商城失败")).send()
     finally:
         await receipt.recall(delay=1)
 

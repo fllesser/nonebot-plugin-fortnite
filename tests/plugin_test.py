@@ -90,7 +90,7 @@ async def test_shop_img(app: App):
 
 
 @pytest.mark.asyncio
-async def test_stats(app: App):
+async def test_stats_matcher(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
@@ -115,6 +115,23 @@ async def test_stats(app: App):
             )
             ctx.should_call_send(msg_event, Message(MessageSegment.image(stats_file)), result=None, bot=bot)
             ctx.should_finished()
+
+
+@pytest.mark.asyncio
+async def test_stats_func():
+    import aiofiles
+
+    from nonebot_plugin_fortnite.config import cache_dir, fconfig
+    from nonebot_plugin_fortnite.stats import get_stats_image
+
+    if fconfig.fortnite_api_key is None:
+        pytest.skip("api_key 未设置，跳过测试")
+
+    bytes_io = await get_stats_image("红桃QAQ", "生涯")
+    assert bytes_io is not None
+
+    async with aiofiles.open(cache_dir / "test_stats_image.png", "wb") as f:
+        await f.write(bytes_io.getvalue())
 
 
 @pytest.mark.asyncio
