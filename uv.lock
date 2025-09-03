@@ -960,7 +960,7 @@ requires-dist = [
     { name = "aiofiles", specifier = ">=24.1.0" },
     { name = "aiohttp", specifier = ">=3.12.15,<4.0.0" },
     { name = "fortnite-api", extras = ["speed"], specifier = ">=3.2.1,<4.0.0" },
-    { name = "httpx", specifier = ">=0.27.0,<1.0.0" },
+    { name = "httpx", extras = ["h2"], specifier = ">=0.27.0,<1.0.0" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.59.4,<1.0.0" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0,<1.0.0" },
     { name = "nonebot-plugin-htmlrender", specifier = ">=0.6.7" },
