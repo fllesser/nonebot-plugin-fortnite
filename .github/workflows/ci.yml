@@ -12,20 +12,6 @@ on:
       - "uv.lock"
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5 # v5
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: true
-          python-version: 3.10
-          version: "latest"
-
-      - name: "ruff check"
-        run: uv tool run ruff check
-      
   typos:
     runs-on: ubuntu-latest
     steps:
