@@ -17,8 +17,6 @@ hot_info_2_path = cache_dir / "hot_info_2.png"
 
 
 async def screenshot_vb_img() -> Path:
-    # browser = await get_browser(headless=True)
-    # context = await browser.new_context()
     async with get_new_page(device_scale_factor=1) as page:
         await _screenshot_vb_img(page)
     await combine_imgs()
@@ -81,7 +79,6 @@ async def combine_imgs():
 
 def _combine_imgs():
     # 打开截图文件（如果存在）
-    combined_image = None
     img_paths = [hot_info_1_path, container_hidden_xs_path, hot_info_2_path]
     img_paths = [i for i in img_paths if i.exists()]
     if not img_paths:
@@ -94,33 +91,37 @@ def _combine_imgs():
             Image.open(img_paths[1]) as img2,
             Image.open(img_paths[2]) as img3,
         ):
-            # 填充更新时间
-            images = [img1, img2, img3]
+            images: list[Image.Image] = [img1, img2, img3]
+
             # 获取尺寸并创建新图像
             widths, heights = zip(*(img.size for img in images))
             total_width = max(widths)
             total_height = sum(heights)
 
-            fill_img_with_time(img1, total_width)
-            combined_image = Image.new("RGB", (total_width, total_height))
+            # 如果 img1.width < total_width，则拉伸最右侧像素到 total_width
+            if img1.width < total_width:
+                img1 = resize_img_with_right_pixel(img1, total_width)
+                images[0] = img1
 
-            # 将截图粘贴到新图像中
-            y_offset = 0
-            for img in images:
-                combined_image.paste(img, (0, y_offset))
-                y_offset += img.height
+            # 填充更新时间
+            draw_time_text(img1, total_width)
+            with Image.new("RGB", (total_width, total_height)) as combined_image:
+                # 将截图粘贴到新图像中
+                y_offset = 0
+                for img in images:
+                    combined_image.paste(img, (0, y_offset))
+                    y_offset += img.height
 
-            # 保存合并后的图像
-            combined_image.save(vb_file)
+                # 保存合并后的图像
+                combined_image.save(vb_file)
+            img1.close()
     finally:
         # 关闭并删除所有截图文件
         for img_path in img_paths:
             img_path.unlink()
-        if combined_image:
-            combined_image.close()
 
 
-def fill_img_with_time(img: Image.Image, width: int = 1126):
+def draw_time_text(img: Image.Image, width: int = 1126):
     draw = ImageDraw.Draw(img)
     font_size = 26
     font = ImageFont.truetype(VB_FONT_PATH, font_size)
@@ -128,3 +129,15 @@ def fill_img_with_time(img: Image.Image, width: int = 1126):
     time_text_width = draw.textlength(time_text, font=font)
     x = width - time_text_width - 10
     draw.text((x, 12), time_text, font=font, fill=(80, 80, 80))
+
+
+def resize_img_with_right_pixel(img: Image.Image, width: int = 1126):
+    new_img = Image.new("RGB", (width, img.height))
+    new_img.paste(img, (0, 0))
+    # 横向取 img 最右侧像素点，填充到 new_img 的 width - 1 到 width 的像素点
+    for x in range(img.width - 50, width):
+        for y in range(img.height):
+            color = img.getpixel((img.width - 50, y))
+            assert color is not None
+            new_img.putpixel((x, y), color)
+    return new_img
