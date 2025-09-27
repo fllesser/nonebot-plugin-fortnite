@@ -18,7 +18,7 @@ dependencies = [
     "nonebot-plugin-alconna>=0.59.4,<1.0.0",
     "nonebot-plugin-localstore>=0.7.4,<1.0.0",
     "nonebot-plugin-apscheduler>=0.5.0,<1.0.0",
-    "nonebot-plugin-htmlrender>=0.7.0a1",
+    "nonebot-plugin-htmlrender>=0.6.6",
 ]
 
 [project.urls]
@@ -45,6 +45,7 @@ test = [
     "pytest-cov>=7.0.0",
     "poethepoet>=0.37.0",
     "playwright==1.55.0",
+    "nonebot-plugin-htmlrender==0.6.6",
 ]
 
 [tool.uv]
