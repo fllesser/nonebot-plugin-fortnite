@@ -112,9 +112,7 @@ async def test_stats_matcher(app: App):
             data={"group_id": msg_event.group_id, "user_id": msg_event.user_id, "no_cache": True},
             result=group_member_info,
         )
-        ctx.should_call_send(
-            msg_event, Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."), result=None, bot=bot
-        )
+        ctx.should_call_send(msg_event, Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."), result=None, bot=bot)
 
         ctx.should_call_send(msg_event, Message(MessageSegment.image(stats_file)), result=None, bot=bot)
         ctx.should_call_api("delete_msg", data={"message_id": msg_event.message_id}, result=None)
