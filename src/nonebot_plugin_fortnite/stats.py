@@ -89,14 +89,11 @@ async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
     return await asyncio.to_thread(_process_image_with_chinese, file, name)
 
 
-_GRADIENT_CACHE: Image.Image | None = None
+from functools import lru_cache
 
 
+@lru_cache(maxsize=1)
 def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
-    global _GRADIENT_CACHE
-    if _GRADIENT_CACHE is not None:
-        return _GRADIENT_CACHE
-
     import numpy as np
 
     # 创建渐变图像
@@ -111,8 +108,7 @@ def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
             gradient[j, i] = start_color + (end_color - start_color) * ratio
 
     # 将渐变图像粘贴到原图
-    _GRADIENT_CACHE = Image.fromarray(gradient)
-    return _GRADIENT_CACHE
+    return Image.fromarray(gradient)
 
 
 def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:

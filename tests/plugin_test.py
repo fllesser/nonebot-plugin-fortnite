@@ -108,7 +108,7 @@ async def test_stats_func():
     bytes_io = await get_stats_image("红桃QAQ", "生涯")
     assert bytes_io is not None
 
-    async with aiofiles.open(cache_dir / "test_stats_image.png", "wb") as f:
+    async with aiofiles.open(cache_dir / "stats_image.png", "wb") as f:
         await f.write(bytes_io.getvalue())
 
 
