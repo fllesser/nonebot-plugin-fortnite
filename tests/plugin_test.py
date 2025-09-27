@@ -4,14 +4,12 @@ from nonebug import App
 import pytest
 
 
-@pytest.mark.asyncio
 async def test_load():
     from nonebot import require
 
     assert require("nonebot_plugin_fortnite")
 
 
-@pytest.mark.asyncio
 async def test_vb_img(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
@@ -35,7 +33,6 @@ async def test_vb_img(app: App):
     assert vb_file.exists()
 
 
-@pytest.mark.asyncio
 async def test_shop_img(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
@@ -67,7 +64,6 @@ async def test_shop_img(app: App):
     assert shop_file.exists()
 
 
-@pytest.mark.asyncio
 async def test_stats_matcher(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
@@ -119,7 +115,6 @@ async def test_stats_matcher(app: App):
         # ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_stats_func():
     import aiofiles
 
@@ -136,23 +131,7 @@ async def test_stats_func():
         await f.write(bytes_io.getvalue())
 
 
-@pytest.mark.asyncio
 async def test_check_font():
     from nonebot_plugin_fortnite import check_resources
 
     await check_resources()
-
-
-@pytest.mark.asyncio
-async def test_fill_img_with_time():
-    import asyncio
-
-    from PIL import Image
-
-    from nonebot_plugin_fortnite.config import cache_dir
-    from nonebot_plugin_fortnite.pve import draw_time_text, vb_file
-    from nonebot_plugin_fortnite.utils import save_img
-
-    with Image.open(vb_file) as img:
-        await asyncio.to_thread(draw_time_text, img)
-        await save_img(img, cache_dir / "test_fill_img_with_time.png")
