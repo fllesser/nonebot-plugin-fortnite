@@ -28,11 +28,13 @@ from .stats import get_level, get_stats_image
 
 
 @get_driver().on_startup
-async def check_font_file():
+async def check_resources():
     import asyncio
     from pathlib import Path
 
     from .config import CHINESE_FONT_PATH, GG_FONT_PATH, STATS_BG_PATH, VB_FONT_PATH
+
+    paths = [CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH, STATS_BG_PATH]
 
     async def dwonload_file(path: Path):
         import aiofiles
@@ -54,7 +56,6 @@ async def check_font_file():
             logger.exception("文件下载失败")
             logger.warning(f"请前往仓库下载资源文件到 {path}")
 
-    paths = [CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH, STATS_BG_PATH]
     tasks = [dwonload_file(path) for path in paths if not path.exists()]
     if len(tasks) > 0:
         await asyncio.gather(*tasks)
