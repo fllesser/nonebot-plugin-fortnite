@@ -53,7 +53,7 @@ jobs:
         run: uv sync --no-dev --frozen
 
       - name: Playwright install chromium-headless
-        run: uv run --no-cache playwright install chromium-headless-shell
+        run: uv run playwright install chromium-headless-shell
 
       - name: Run Pytest
         run: uv run poe test
