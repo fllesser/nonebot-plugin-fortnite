@@ -52,9 +52,6 @@ jobs:
       - name: Install Dependencies for test group
         run: uv sync --no-dev --locked
 
-      - name: Playwright Uninstall
-        run: uv run playwright uninstall
-
       - name: Install Playwright (Linux only)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: uv run playwright install chromium-headless-shell --with-deps
