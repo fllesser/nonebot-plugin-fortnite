@@ -52,14 +52,6 @@ jobs:
       - name: Install Dependencies for test group
         run: uv sync --no-dev --locked
 
-      - name: Install Playwright (Linux only)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: uv run playwright install chromium-headless-shell --with-deps
-
-      - name: Install Playwright (Not Linux)
-        if: ${{ matrix.os != 'ubuntu-latest' }}
-        run: uv run playwright install chromium-headless-shell
-
       - name: Run Pytest
         run: uv run poe test
 
