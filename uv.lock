@@ -974,7 +974,7 @@ requires-dist = [
     { name = "nonebot-plugin-uninfo", specifier = ">=0.9.0,<1.0.0" },
     { name = "nonebot2", specifier = ">=2.4.3,<3.0.0" },
     { name = "numpy", specifier = ">=2.3.3" },
-    { name = "pillow", specifier = ">=11.3.0" },
+    { name = "pillow", specifier = ">=11.2.1" },
 ]
 
 [package.metadata.requires-dev]
