@@ -110,6 +110,18 @@ def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
     return Image.fromarray(gradient)
 
 
+@lru_cache(maxsize=1)
+def create_gradient_image_new() -> Image.Image:
+    """从底图裁剪渐变图片"""
+    # 矩形区域的坐标
+    left, top, right, bottom = 26, 90, 423, 230
+    from .config import STATS_BG_PATH
+
+    with Image.open(STATS_BG_PATH) as img:
+        gradient_img = img.crop((left, top, right, bottom))
+        return gradient_img
+
+
 def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
     with Image.open(bytes_io, formats=["PNG"]) as img:
         draw = ImageDraw.Draw(img)
@@ -119,7 +131,7 @@ def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
 
         # 创建渐变色并填充矩形区域
         # width = right - left, height = bottom - top
-        gradient_img = create_gradient_image()
+        gradient_img = create_gradient_image_new()
         img.paste(gradient_img, (left, top))
         # 指定字体
         font_size = 36

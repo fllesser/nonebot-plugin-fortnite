@@ -52,7 +52,7 @@ jobs:
       - name: Install Dependencies for test group
         run: uv sync --no-dev --frozen
 
-      - name: Playwright install chromium-headless
+      - name: Playwright install chromium-headless-shell
         run: uv run playwright install chromium-headless-shell
 
       - name: Run Pytest
