@@ -90,7 +90,7 @@ async def test_stats_matcher(app: App):
         "max_member_count": 2000,
     }
 
-    group_member_info = {
+    group_memeber_info = {
         "user_id": msg_events[0].user_id,
         "group_id": msg_events[0].group_id,
         "nickname": "红桃QAQ",
@@ -110,7 +110,7 @@ async def test_stats_matcher(app: App):
         ctx.should_call_api(
             "get_group_member_info",
             data={"group_id": msg_event.group_id, "user_id": msg_event.user_id, "no_cache": True},
-            result=group_member_info,
+            result=group_memeber_info,
         )
         ctx.should_call_send(msg_event, Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."), result=None, bot=bot)
 
