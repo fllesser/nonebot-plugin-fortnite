@@ -180,3 +180,5 @@ pyrightconfig.json
 data/
 cache/
 config/
+
+.env.dev
