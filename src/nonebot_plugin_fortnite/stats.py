@@ -89,6 +89,32 @@ async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
     return await asyncio.to_thread(_process_image_with_chinese, file, name)
 
 
+_GRADIENT_CACHE: Image.Image | None = None
+
+
+def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
+    global _GRADIENT_CACHE
+    if _GRADIENT_CACHE is not None:
+        return _GRADIENT_CACHE
+
+    import numpy as np
+
+    # 创建渐变图像
+    gradient = np.zeros((height, width, 3), dtype=np.uint8)
+    start_color = np.array([0, 33, 69])
+    end_color = np.array([0, 82, 106])
+
+    # 向量化计算渐变
+    for i in range(width):
+        for j in range(height):
+            ratio = (i + j) / (width + height)
+            gradient[j, i] = start_color + (end_color - start_color) * ratio
+
+    # 将渐变图像粘贴到原图
+    _GRADIENT_CACHE = Image.fromarray(gradient)
+    return _GRADIENT_CACHE
+
+
 def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
     with Image.open(bytes_io, formats=["PNG"]) as img:
         draw = ImageDraw.Draw(img)
@@ -97,21 +123,11 @@ def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
         left, top, right, bottom = 26, 90, 423, 230
 
         # 创建渐变色并填充矩形区域
-        width = right - left
-        height = bottom - top
-
-        start_color = (0, 33, 69, 255)
-        end_color = (0, 82, 106, 255)
-        for i in range(width):
-            for j in range(height):
-                r = int(start_color[0] + (end_color[0] - start_color[0]) * (i + j) / (width + height))
-                g = int(start_color[1] + (end_color[1] - start_color[1]) * (i + j) / (width + height))
-                b = int(start_color[2] + (end_color[2] - start_color[2]) * (i + j) / (width + height))
-                draw.point((left + i, top + j), fill=(r, g, b))
-
+        # width = right - left, height = bottom - top
+        gradient_img = create_gradient_image()
+        img.paste(gradient_img, (left, top))
         # 指定字体
         font_size = 36
-        # hansans = data_dir / "SourceHanSansSC-Bold-2.otf"
         font = ImageFont.truetype(CHINESE_FONT_PATH, font_size)
 
         # 计算字体坐标
