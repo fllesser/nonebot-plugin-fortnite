@@ -1036,7 +1036,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1,<1.0.0" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.59.4,<1.0.0" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0,<1.0.0" },
-    { name = "nonebot-plugin-htmlrender", specifier = ">=0.6.8" },
+    { name = "nonebot-plugin-htmlrender", specifier = ">=0.6.8,<1.0.0" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4,<1.0.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.9.0,<1.0.0" },
     { name = "nonebot2", specifier = ">=2.4.3,<3.0.0" },
