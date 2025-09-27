@@ -70,7 +70,6 @@ async def get_stats_img_by_url(url: str, name: str) -> BytesIO:
 
         # 将响应内容转换为字节流
         image_data = BytesIO(response.content)
-
     # 如果不包含中文名，返回原图
     if not contains_chinese(name):
         return image_data

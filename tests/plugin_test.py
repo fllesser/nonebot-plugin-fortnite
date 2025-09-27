@@ -105,10 +105,10 @@ async def test_stats_func():
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
-    bytes_io = await get_stats_image("红桃QAQ", "生涯")
+    bytes_io = await get_stats_image("别打好疼", "生涯")
     assert bytes_io is not None
 
-    async with aiofiles.open(cache_dir / "stats_image.png", "wb") as f:
+    async with aiofiles.open(cache_dir / "stats_bieda_haoteng_image.png", "wb") as f:
         await f.write(bytes_io.getvalue())
 
 
