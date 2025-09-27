@@ -90,32 +90,31 @@ async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
 
 from functools import lru_cache
 
+# @lru_cache(maxsize=1)
+# def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
+#     import numpy as np
 
-@lru_cache(maxsize=1)
-def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
-    import numpy as np
+#     # 创建渐变图像
+#     gradient = np.zeros((height, width, 3), dtype=np.uint8)
+#     start_color = np.array([0, 33, 69])
+#     end_color = np.array([0, 82, 106])
 
-    # 创建渐变图像
-    gradient = np.zeros((height, width, 3), dtype=np.uint8)
-    start_color = np.array([0, 33, 69])
-    end_color = np.array([0, 82, 106])
+#     # 向量化计算渐变
+#     for i in range(width):
+#         for j in range(height):
+#             ratio = (i + j) / (width + height)
+#             gradient[j, i] = start_color + (end_color - start_color) * ratio
 
-    # 向量化计算渐变
-    for i in range(width):
-        for j in range(height):
-            ratio = (i + j) / (width + height)
-            gradient[j, i] = start_color + (end_color - start_color) * ratio
-
-    # 将渐变图像粘贴到原图
-    return Image.fromarray(gradient)
+#     # 将渐变图像粘贴到原图
+#     return Image.fromarray(gradient)
 
 
 @lru_cache(maxsize=1)
 def create_gradient_image_new() -> Image.Image:
     """从底图裁剪渐变图片"""
-    # 矩形区域的坐标
-    left, top, right, bottom = 26, 90, 423, 230
     from .config import STATS_BG_PATH
+
+    left, top, right, bottom = 26, 90, 423, 230
 
     with Image.open(STATS_BG_PATH) as img:
         gradient_img = img.crop((left, top, right, bottom))

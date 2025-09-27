@@ -50,7 +50,7 @@ jobs:
           version: "latest"
 
       - name: Install Dependencies for test group
-        run: uv sync --no-dev --frozen
+        run: uv sync --no-dev --locked
 
       - name: Install Playwright (Linux)
         if: matrix.os == 'ubuntu-latest'

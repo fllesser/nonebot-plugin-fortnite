@@ -138,9 +138,9 @@ async def test_stats_func():
 
 @pytest.mark.asyncio
 async def test_check_font():
-    from nonebot_plugin_fortnite import check_font_file
+    from nonebot_plugin_fortnite import check_resources
 
-    await check_font_file()
+    await check_resources()
 
 
 @pytest.mark.asyncio
