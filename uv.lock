@@ -1054,7 +1054,7 @@ dev = [
 ]
 test = [
     { name = "nonebot-adapter-onebot", specifier = ">=2.4.6,<3.0.0" },
-    { name = "nonebot-plugin-htmlrender", specifier = "==0.6.6" },
+    { name = "nonebot-plugin-htmlrender", specifier = "==0.6.8" },
     { name = "nonebot2", extras = ["fastapi"], specifier = ">=2.4.3,<3.0.0" },
     { name = "nonebug", specifier = ">=0.4.3,<1.0.0" },
     { name = "playwright", specifier = "==1.55.0" },
@@ -1066,21 +1066,22 @@ test = [
 
 [[package]]
 name = "nonebot-plugin-htmlrender"
-version = "0.6.6"
+version = "0.6.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "jinja2" },
     { name = "markdown" },
+    { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
     { name = "playwright" },
     { name = "pygments" },
     { name = "pymdown-extensions" },
     { name = "python-markdown-math" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/18/19b30736b8821db13f49826513691203c5ec77e48034374654d793bcfe7c/nonebot_plugin_htmlrender-0.6.6.tar.gz", hash = "sha256:3cf3594431d995d6d960dbf445e13a88f8580f799eedc303a652f12540b8198c", size = 1375063, upload-time = "2025-05-22T03:17:22.473Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c9/8f/e59f63ee53fdf009c185f0c98d0a9b4b68739cf2f4c4ce2460440cca2401/nonebot_plugin_htmlrender-0.6.8.tar.gz", hash = "sha256:8c8ec7fe9d0c1b38d5d2133c36b187ef4edf3c995863f39f0850ef69ab9d1f57", size = 1394413, upload-time = "2025-09-10T06:24:30.854Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/2e/7a66cd7a2614d1f328117be3e9a5c30d992ef3f3be8c3cd52fdf6bb7185f/nonebot_plugin_htmlrender-0.6.6-py3-none-any.whl", hash = "sha256:b0dc4130b4740fe6fda7b6c2424f277ea9d13713c74949a040512fddda92bd9a", size = 1064169, upload-time = "2025-05-22T03:17:20.887Z" },
+    { url = "https://files.pythonhosted.org/packages/18/f6/69ec701768dd0feeafb77eea4343096d58b189ef16d90723acc9cc0fb052/nonebot_plugin_htmlrender-0.6.8-py3-none-any.whl", hash = "sha256:64b41ef0788449d2c858086b299cb6aef82806c3844cb2706245c1e180a3d7db", size = 1065646, upload-time = "2025-09-10T06:24:28.877Z" },
 ]
 
 [[package]]
