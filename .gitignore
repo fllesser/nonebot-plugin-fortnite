@@ -182,3 +182,4 @@ cache/
 config/
 
 .env.dev
+junit.xml
