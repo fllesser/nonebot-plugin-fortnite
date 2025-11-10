@@ -5,7 +5,7 @@
 ## ✨ nonebot-plugin-fortnite ✨
 [![LICENSE](https://img.shields.io/github/license/fllesser/nonebot-plugin-fortnite.svg)](./LICENSE)
 [![pypi](https://img.shields.io/pypi/v/nonebot-plugin-fortnite.svg)](https://pypi.python.org/pypi/nonebot-plugin-fortnite)
-[![python](https://img.shields.io/badge/python-3.10|3.11|3.12|3.13-blue.svg)](https://www.python.org)
+[![python](https://img.shields.io/badge/python-3.10|3.11|3.12|3.13|3.14-blue.svg)](https://www.python.org)
 [![uv](https://img.shields.io/badge/package%20manager-uv-black?style=flat-square&logo=uv)](https://github.com/astral-sh/uv)
 <br/>
 [![ruff](https://img.shields.io/badge/code%20style-ruff-black?style=flat-square&logo=ruff)](https://github.com/astral-sh/ruff)
