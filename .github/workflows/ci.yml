@@ -38,6 +38,7 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
       UV_NO_SYNC: 1
+      FORTNITE_API_KEY: ${{ secrets.FORTNITE_API_KEY }}
 
     steps:
       - uses: actions/checkout@v5
