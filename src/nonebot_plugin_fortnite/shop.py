@@ -49,7 +49,6 @@ async def _screenshot_shop_img(page: Page):
             await asyncio.sleep(1)  # 等待1秒以加载内容
 
     await asyncio.gather(wait_for_load(), scroll_page())
-
     await page.screenshot(path=shop_file, full_page=True)
 
 
