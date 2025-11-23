@@ -14,10 +14,10 @@ async def test_vb_img(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
-    from nonebot_plugin_fortnite import vb_file, vb_matcher
+    from nonebot_plugin_fortnite import VB_FILE, vb_matcher
 
-    if vb_file.exists():
-        vb_file.unlink()
+    if VB_FILE.exists():
+        VB_FILE.unlink()
 
     texts = ["vb图", "VB图", "Vb图"]
     msg_events = [fake_group_message_event_v11(message=text) for text in texts]
@@ -27,20 +27,21 @@ async def test_vb_img(app: App):
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         for event in msg_events:
             ctx.receive_event(bot, event)
-            ctx.should_call_send(event, Message(MessageSegment.image(vb_file)), result=None, bot=bot)
+            image = MessageSegment.image(VB_FILE)
+            ctx.should_call_send(event, Message(image), result=None, bot=bot)
             ctx.should_finished()
 
-    assert vb_file.exists()
+    assert VB_FILE.exists()
 
 
 async def test_shop_img(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
-    from nonebot_plugin_fortnite import shop_file, shop_matcher
+    from nonebot_plugin_fortnite import SHOP_FILE, shop_matcher
 
-    if shop_file.exists():
-        shop_file.unlink()
+    if SHOP_FILE.exists():
+        SHOP_FILE.unlink()
 
     texts = ["商城", "商城。。。。"]
     msg_events = [fake_group_message_event_v11(message=text) for text in texts]
@@ -50,9 +51,10 @@ async def test_shop_img(app: App):
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         for event in msg_events:
             ctx.receive_event(bot, event)
-            # assert shop_file.exists()
+            # assert SHOP_FILE.exists()
             should_send = (
-                MessageSegment.image(shop_file) + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
+                MessageSegment.image(SHOP_FILE)
+                + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
             )
             ctx.should_call_send(
                 event,
@@ -61,7 +63,7 @@ async def test_shop_img(app: App):
                 bot=bot,
             )
             ctx.should_finished()
-    assert shop_file.exists()
+    assert SHOP_FILE.exists()
 
 
 async def test_stats_matcher(app: App):
@@ -102,17 +104,29 @@ async def test_stats_matcher(app: App):
         msg_event = msg_events[0]
         ctx.receive_event(bot, msg_event)
         stats_file = await get_stats_image("红桃QAQ", commands[0])
-        ctx.should_call_api("get_group_info", data={"group_id": msg_event.group_id}, result=group_info)
+        ctx.should_call_api(
+            "get_group_info", data={"group_id": msg_event.group_id}, result=group_info
+        )
         ctx.should_call_api(
             "get_group_member_info",
-            data={"group_id": msg_event.group_id, "user_id": msg_event.user_id, "no_cache": True},
+            data={
+                "group_id": msg_event.group_id,
+                "user_id": msg_event.user_id,
+                "no_cache": True,
+            },
             result=group_member_info,
         )
-        ctx.should_call_send(msg_event, Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."), result=None, bot=bot)
-
-        ctx.should_call_send(msg_event, Message(MessageSegment.image(stats_file)), result=None, bot=bot)
-        ctx.should_call_api("delete_msg", data={"message_id": msg_event.message_id}, result=None)
-        # ctx.should_finished()
+        ctx.should_call_send(
+            msg_event,
+            Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."),
+            result=None,
+            bot=bot,
+        )
+        image = MessageSegment.image(stats_file)
+        ctx.should_call_send(msg_event, Message(image), result=None, bot=bot)
+        ctx.should_call_api(
+            "delete_msg", data={"message_id": msg_event.message_id}, result=None
+        )
 
 
 async def test_stats_func():

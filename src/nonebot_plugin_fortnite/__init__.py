@@ -19,12 +19,15 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     config=Config,
     homepage="https://github.com/fllesser/nonebot-plugin-fortnite",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_uninfo"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_uninfo"
+    ),
 )
 
-from .pve import screenshot_vb_img, vb_file
-from .shop import screenshot_shop_img, shop_file
+from .pve import VB_FILE, screenshot_vb_img
+from .shop import SHOP_FILE, screenshot_shop_img
 from .stats import get_level, get_stats_image
+from .utils import get_size_in_mb
 
 
 @get_driver().on_startup
@@ -51,7 +54,8 @@ async def check_resources():
             async with aiofiles.open(path, "wb") as f:
                 await f.write(font_data)
 
-            logger.success(f"文件 {path.name} 下载成功，文件大小: {path.stat().st_size / 1024 / 1024:.2f} MB")
+            size = get_size_in_mb(path)
+            logger.success(f"文件 {path.name} 下载成功，文件大小: {size:.2f} MB")
         except Exception:
             logger.exception("文件下载失败")
             logger.warning(f"请前往仓库下载资源文件到 {path}")
@@ -72,12 +76,14 @@ async def _():
     logger.info("开始更新商城/VB图...")
     try:
         await screenshot_shop_img()
-        logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
+        size = get_size_in_mb(SHOP_FILE)
+        logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
     except Exception:
         logger.exception("商城更新失败")
     try:
         await screenshot_vb_img()
-        logger.success(f"vb图更新成功，文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
+        size = get_size_in_mb(VB_FILE)
+        logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
     except Exception:
         logger.exception("vb图更新失败")
 
@@ -114,7 +120,10 @@ async def _(matcher: AlconnaMatcher, session: Uninfo, name: Match[str]):
 
 
 name_prompt = UniMessage.template(
-    "{:At(user, $event.get_user_id())} 请发送游戏名称\n群昵称设置如下可快速查询:\n    id:name\n    ID name"
+    "{:At(user, $event.get_user_id())} 请发送游戏名称\n"
+    "群昵称设置如下可快速查询:\n"
+    "    id:name\n"
+    "    ID name"
 )
 
 
@@ -147,14 +156,18 @@ shop_matcher = on_startswith("商城")
 
 @shop_matcher.handle()
 async def _():
-    if not shop_file.exists():
+    if not SHOP_FILE.exists():
         logger.info("商城图不存在, 开始更新商城...")
         try:
             await screenshot_shop_img()
-            logger.success(f"商城更新成功，文件大小: {shop_file.stat().st_size / 1024 / 1024:.2f} MB")
+            size = get_size_in_mb(SHOP_FILE)
+            logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
         except Exception:
             logger.exception("商城更新失败")
-    await UniMessage(Image(path=shop_file) + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")).send()
+    await UniMessage(
+        Image(path=SHOP_FILE)
+        + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")
+    ).send()
 
 
 @on_startswith("更新商城", permission=SUPERUSER).handle()
@@ -175,19 +188,20 @@ vb_matcher = on_startswith(("vb图", "VB图", "Vb图"))
 
 @vb_matcher.handle()
 async def _():
-    if not vb_file.exists():
+    if not VB_FILE.exists():
         logger.info("vb 图不存在, 开始更新vb图...")
         try:
             await screenshot_vb_img()
-            logger.success(f"vb图更新成功, 文件大小: {vb_file.stat().st_size / 1024 / 1024:.2f} MB")
+            size = get_size_in_mb(VB_FILE)
+            logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
         except Exception as e:
             logger.warning(f"vb图更新失败: {e}")
-    await UniMessage(Image(path=vb_file)).send()
+    await UniMessage(Image(path=VB_FILE)).send()
 
 
 @on_startswith("更新vb图", permission=SUPERUSER).handle()
 async def _():
-    receipt = await UniMessage.text("正在更新vb图，请稍后...").send()
+    receipt = await UniMessage.text("正在更新vb图, 请稍后...").send()
     try:
         file = await screenshot_vb_img()
         await UniMessage(Text("手动更新 VB 图成功") + Image(path=file)).send()

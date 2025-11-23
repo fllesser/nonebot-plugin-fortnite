@@ -30,7 +30,9 @@ def handle_fortnite_api_exception(e: FortniteAPIException) -> str:
 
 
 async def get_level(name: str, cmd_header: str) -> str:
-    time_window: Any = TimeWindow.LIFETIME if cmd_header.startswith("生涯") else TimeWindow.SEASON
+    time_window: Any = (
+        TimeWindow.LIFETIME if cmd_header.startswith("生涯") else TimeWindow.SEASON
+    )
     try:
         async with Client(api_key=API_KEY) as client:
             stats = await client.fetch_br_stats(name=name, time_window=time_window)
@@ -43,7 +45,9 @@ async def get_level(name: str, cmd_header: str) -> str:
 
 
 async def get_stats_image(name: str, cmd_header: str) -> BytesIO:
-    time_window: Any = TimeWindow.LIFETIME if cmd_header.startswith("生涯") else TimeWindow.SEASON
+    time_window: Any = (
+        TimeWindow.LIFETIME if cmd_header.startswith("生涯") else TimeWindow.SEASON
+    )
     image_type: Any = StatsImageType.ALL
     try:
         async with Client(api_key=API_KEY) as client:
