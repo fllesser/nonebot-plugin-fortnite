@@ -5,15 +5,22 @@ from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
 from .config import GG_FONT_PATH, data_dir
+from .utils import retry
 
-shop_file = data_dir / "shop.png"
+SHOP_FILE = data_dir / "shop.png"
 
 
 async def screenshot_shop_img() -> Path:
     # url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",  # noqa: E501
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",  # noqa: E501
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            " (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
+        ),
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,"
+            "image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+        ),
         "Accept-Encoding": "gzip, deflate",
         "upgrade-insecure-requests": "1",
         "dnt": "1",
@@ -29,13 +36,15 @@ async def screenshot_shop_img() -> Path:
     async with get_new_page(device_scale_factor=1, extra_http_headers=headers) as page:
         await _screenshot_shop_img(page)
     await add_update_time()
-    return shop_file
+    return SHOP_FILE
 
 
+@retry(3, 10)
 async def _screenshot_shop_img(page: Page):
     url = "https://fortnite.gg/shop"
-    # page.on('requestfailed', lambda request: logger.warning(f'Request failed: {request.url}'))
-    await page.add_style_tag(content="* { transition: none !important; animation: none !important; }")
+    await page.add_style_tag(
+        content="* { transition: none !important; animation: none !important; }"
+    )
     await page.goto(url)
 
     async def wait_for_load():
@@ -49,7 +58,7 @@ async def _screenshot_shop_img(page: Page):
             await asyncio.sleep(1)  # 等待1秒以加载内容
 
     await asyncio.gather(wait_for_load(), scroll_page())
-    await page.screenshot(path=shop_file, full_page=True)
+    await page.screenshot(path=SHOP_FILE, full_page=True)
 
 
 async def add_update_time():
@@ -62,7 +71,7 @@ def _add_update_time():
     from PIL import Image, ImageDraw, ImageFont
 
     font = ImageFont.truetype(GG_FONT_PATH, 88)
-    with Image.open(shop_file) as img:
+    with Image.open(SHOP_FILE) as img:
         draw = ImageDraw.Draw(img)
         # 先填充 rgb(47,49,54) 背景 1280 * 100
         draw.rectangle((0, 0, 1280, 270), fill=(47, 49, 54))
@@ -71,4 +80,4 @@ def _add_update_time():
         time_text_width = draw.textlength(time_text, font=font)
         x = (1280 - time_text_width) / 2
         draw.text((x, 100), time_text, font=font, fill=(255, 255, 255))
-        img.save(shop_file)
+        img.save(SHOP_FILE)
