@@ -28,7 +28,12 @@ async def test_vb_img(app: App):
         for event in msg_events:
             ctx.receive_event(bot, event)
             image = MessageSegment.image(VB_FILE)
-            ctx.should_call_send(event, Message(image), result=None, bot=bot)
+            ctx.should_call_send(
+                event,
+                Message(image),
+                result=None,
+                bot=bot,
+            )
             ctx.should_finished()
 
     assert VB_FILE.exists()
@@ -105,7 +110,9 @@ async def test_stats_matcher(app: App):
         ctx.receive_event(bot, msg_event)
         stats_file = await get_stats_image("红桃QAQ", commands[0])
         ctx.should_call_api(
-            "get_group_info", data={"group_id": msg_event.group_id}, result=group_info
+            "get_group_info",
+            data={"group_id": msg_event.group_id},
+            result=group_info,
         )
         ctx.should_call_api(
             "get_group_member_info",
@@ -122,6 +129,7 @@ async def test_stats_matcher(app: App):
             result=None,
             bot=bot,
         )
+
         image = MessageSegment.image(stats_file)
         ctx.should_call_send(
             msg_event,
@@ -129,8 +137,11 @@ async def test_stats_matcher(app: App):
             result=None,
             bot=bot,
         )
+
         ctx.should_call_api(
-            "delete_msg", data={"message_id": msg_event.message_id}, result=None
+            "delete_msg",
+            data={"message_id": msg_event.message_id},
+            result=None,
         )
 
 

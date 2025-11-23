@@ -104,10 +104,10 @@ async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
     return await asyncio.to_thread(_process_image_with_chinese, file, name)
 
 
-from functools import lru_cache
+from functools import cache
 
 
-@lru_cache(maxsize=1)
+@cache
 def create_gradient_image_new() -> Image.Image:
     """从底图裁剪渐变图片"""
     from .config import STATS_BG_PATH
@@ -116,6 +116,7 @@ def create_gradient_image_new() -> Image.Image:
 
     with Image.open(STATS_BG_PATH) as img:
         gradient_img = img.crop((left, top, right, bottom))
+        gradient_img.load()
         return gradient_img
 
 
