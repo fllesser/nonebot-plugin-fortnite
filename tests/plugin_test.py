@@ -123,26 +123,26 @@ async def test_stats_matcher(app: App):
             bot=bot,
         )
         image = MessageSegment.image(stats_file)
-        ctx.should_call_send(msg_event, Message(image), result=None, bot=bot)
+        ctx.should_call_send(
+            msg_event,
+            Message(image),
+            result=None,
+            bot=bot,
+        )
         ctx.should_call_api(
             "delete_msg", data={"message_id": msg_event.message_id}, result=None
         )
 
 
 async def test_stats_func():
-    import aiofiles
-
-    from nonebot_plugin_fortnite.config import cache_dir, fconfig
+    from nonebot_plugin_fortnite.config import fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
 
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
-    bytes_io = await get_stats_image("别打好疼", "生涯")
-    assert bytes_io is not None
-
-    async with aiofiles.open(cache_dir / "stats_bieda_haoteng_image.png", "wb") as f:
-        await f.write(bytes_io.getvalue())
+    file = await get_stats_image("别打好疼", "生涯")
+    assert file.exists()
 
 
 async def test_check_font():

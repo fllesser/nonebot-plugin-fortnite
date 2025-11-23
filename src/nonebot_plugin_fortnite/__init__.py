@@ -141,14 +141,15 @@ async def _(arp: Arparma, name: str):
     header: str = arp.header_match.result
     receipt = await UniMessage.text(f"正在查询 {name} 的{header}，请稍后...").send()
     try:
-        res = await get_stats_image(name, header)
+        file = await get_stats_image(name, header)
     except Exception as e:
         if isinstance(e, ValueError):
             await UniMessage(Text(str(e))).finish()
         logger.exception("查询失败")
         await UniMessage(Text("查询失败")).finish()
-    await UniMessage(Image(raw=res)).send()
+    await UniMessage(Image(path=file)).send()
     await receipt.recall(delay=1)
+    file.unlink(missing_ok=True)
 
 
 shop_matcher = on_startswith("商城")

@@ -1,14 +1,17 @@
 import asyncio
+import hashlib
 from io import BytesIO
+from pathlib import Path
 from typing import Any
 
+import aiofiles
 from fortnite_api import Client
 from fortnite_api.enums import StatsImageType, TimeWindow
 from fortnite_api.errors import FortniteAPIException
 import httpx
 from PIL import Image, ImageDraw, ImageFont
 
-from .config import CHINESE_FONT_PATH, fconfig
+from .config import CHINESE_FONT_PATH, cache_dir, fconfig
 
 API_KEY: str | None = fconfig.fortnite_api_key
 
@@ -44,7 +47,7 @@ async def get_level(name: str, cmd_header: str) -> str:
     return f"{stats.user.name}: Lv{bp.level} | {bp.progress}% to Lv{bp.level + 1}"
 
 
-async def get_stats_image(name: str, cmd_header: str) -> BytesIO:
+async def get_stats_image(name: str, cmd_header: str) -> Path:
     time_window: Any = (
         TimeWindow.LIFETIME if cmd_header.startswith("生涯") else TimeWindow.SEASON
     )
@@ -60,7 +63,16 @@ async def get_stats_image(name: str, cmd_header: str) -> BytesIO:
         raise ValueError(handle_fortnite_api_exception(e))
     if stats.image is None:
         raise ValueError(f"未查询到 {stats.user.name} 的战绩")
-    return await get_stats_img_by_url(stats.image.url, stats.user.name)
+
+    img_bytes = await get_stats_img_by_url(stats.image.url, stats.user.name)
+
+    hash_str = hashlib.md5(f"{name}{cmd_header}".encode()).hexdigest()
+    file_path = cache_dir / f"{hash_str}.png"
+
+    async with aiofiles.open(file_path, "wb") as f:
+        await f.write(img_bytes.getvalue())
+
+    return file_path
 
 
 async def get_stats_img_by_url(url: str, name: str) -> BytesIO:
@@ -93,24 +105,6 @@ async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
 
 
 from functools import lru_cache
-
-# @lru_cache(maxsize=1)
-# def create_gradient_image(width: int = 397, height: int = 140) -> Image.Image:
-#     import numpy as np
-
-#     # 创建渐变图像
-#     gradient = np.zeros((height, width, 3), dtype=np.uint8)
-#     start_color = np.array([0, 33, 69])
-#     end_color = np.array([0, 82, 106])
-
-#     # 向量化计算渐变
-#     for i in range(width):
-#         for j in range(height):
-#             ratio = (i + j) / (width + height)
-#             gradient[j, i] = start_color + (end_color - start_color) * ratio
-
-#     # 将渐变图像粘贴到原图
-#     return Image.fromarray(gradient)
 
 
 @lru_cache(maxsize=1)
