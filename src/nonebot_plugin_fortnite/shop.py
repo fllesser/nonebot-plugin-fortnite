@@ -10,7 +10,6 @@ from .utils import retry
 SHOP_FILE = data_dir / "shop.png"
 
 
-@retry(3, 10)
 async def screenshot_shop_img() -> Path:
     # url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
     headers = {
@@ -40,6 +39,7 @@ async def screenshot_shop_img() -> Path:
     return SHOP_FILE
 
 
+@retry(3, 10)
 async def _screenshot_shop_img(page: Page):
     url = "https://fortnite.gg/shop"
     await page.add_style_tag(

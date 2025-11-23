@@ -15,7 +15,6 @@ from .utils import retry
 VB_FILE = data_dir / "vb.png"
 
 
-@retry(retries=3, delay=10)
 async def screenshot_vb_img() -> Path:
     async with get_new_page(device_scale_factor=1) as page:
         await _screenshot_vb_img(page)
@@ -30,6 +29,7 @@ _SELECTOR_MAP = {
 }
 
 
+@retry(retries=3, delay=10)
 async def _screenshot_vb_img(page: Page):
     url = "https://freethevbucks.com/timed-missions"
 
@@ -54,19 +54,16 @@ async def _screenshot_vb_img(page: Page):
     await page.route("**/*", ad_block_handler)
     await page.goto(url)
 
-    # 截图函数，超时则跳过
+    # 截图
     async def screenshot(filename: str, selector: str, nth: int = 0) -> None:
-        try:
-            locator = page.locator(selector).nth(nth)
-            # 检查元素内容是否为空
-            content = await locator.inner_html()
-            path = cache_dir / filename
-            if content.strip():
-                await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
-            else:
-                logger.warning(f"Locator for {path.name} is empty.")
-        except Exception:
-            pass
+        locator = page.locator(selector).nth(nth)
+        # 检查元素内容是否为空
+        content = await locator.inner_html()
+        path = cache_dir / filename
+        if content.strip():
+            await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
+        else:
+            logger.warning(f"Locator for {path.name} is empty.")
 
     await asyncio.gather(*[screenshot(file, *sn) for file, sn in _SELECTOR_MAP.items()])
 
