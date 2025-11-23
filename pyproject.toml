@@ -2,7 +2,7 @@
 
 [project]
 name = "nonebot-plugin-fortnite"
-version = "0.5.1"
+version = "0.5.2"
 description = "堡垒之夜插件"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -47,7 +47,7 @@ test = [
 ]
 
 [tool.bumpversion]
-current_version = "0.5.1"
+current_version = "0.5.2"
 commit = true
 message = "🔖 release: bump vesion from {current_version} to {new_version}"
 tag = true
