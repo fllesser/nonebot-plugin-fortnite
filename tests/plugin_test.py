@@ -1,4 +1,4 @@
-from fake import fake_group_message_event_v11
+from fake import fake_group_message_event_v11 as fake_gme
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 import pytest
@@ -20,7 +20,7 @@ async def test_vb_img(app: App):
         VB_FILE.unlink()
 
     texts = ["vb图", "VB图", "Vb图"]
-    msg_events = [fake_group_message_event_v11(message=text) for text in texts]
+    msg_events = [fake_gme(message=text) for text in texts]
 
     async with app.test_matcher(vb_matcher) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
@@ -49,7 +49,7 @@ async def test_shop_img(app: App):
         SHOP_FILE.unlink()
 
     texts = ["商城", "商城。。。。"]
-    msg_events = [fake_group_message_event_v11(message=text) for text in texts]
+    msg_events = [fake_gme(message=text) for text in texts]
 
     async with app.test_matcher(shop_matcher) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
@@ -83,7 +83,7 @@ async def test_stats_matcher(app: App):
         pytest.skip("api_key 未设置，跳过测试")
 
     commands = ["战绩", "生涯战绩"]
-    msg_events = [fake_group_message_event_v11(message=cmd) for cmd in commands]
+    msg_events = [fake_gme(message=cmd) for cmd in commands]
 
     group_info = {
         "group_id": msg_events[0].group_id,
