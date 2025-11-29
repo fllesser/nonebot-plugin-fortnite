@@ -1154,7 +1154,7 @@ dev = [
 ]
 test = [
     { name = "nonebot-adapter-onebot", specifier = ">=2.4.6,<3.0.0" },
-    { name = "nonebot-plugin-htmlrender", specifier = "==0.6.6" },
+    { name = "nonebot-plugin-htmlrender", specifier = "==0.6.7" },
     { name = "nonebot2", extras = ["fastapi"], specifier = ">=2.4.4,<3.0.0" },
     { name = "nonebug", specifier = ">=0.4.3,<1.0.0" },
     { name = "playwright", specifier = "==1.55.0" },
@@ -1166,7 +1166,7 @@ test = [
 
 [[package]]
 name = "nonebot-plugin-htmlrender"
-version = "0.6.6"
+version = "0.6.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1178,9 +1178,9 @@ dependencies = [
     { name = "pymdown-extensions" },
     { name = "python-markdown-math" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/18/19b30736b8821db13f49826513691203c5ec77e48034374654d793bcfe7c/nonebot_plugin_htmlrender-0.6.6.tar.gz", hash = "sha256:3cf3594431d995d6d960dbf445e13a88f8580f799eedc303a652f12540b8198c", size = 1375063, upload-time = "2025-05-22T03:17:22.473Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/b4/bb23fa23ff5a554a64dbfa849fd505f7270f25d9a178f153e9f685e9ee73/nonebot_plugin_htmlrender-0.6.7.tar.gz", hash = "sha256:968b06bdfef10e06ad64c9d945c89000b1eaa82a89d5bae71a0647a3a6271c38", size = 1392554, upload-time = "2025-08-19T03:41:09.054Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/2e/7a66cd7a2614d1f328117be3e9a5c30d992ef3f3be8c3cd52fdf6bb7185f/nonebot_plugin_htmlrender-0.6.6-py3-none-any.whl", hash = "sha256:b0dc4130b4740fe6fda7b6c2424f277ea9d13713c74949a040512fddda92bd9a", size = 1064169, upload-time = "2025-05-22T03:17:20.887Z" },
+    { url = "https://files.pythonhosted.org/packages/75/30/e307374ef0b83fe8dc36004d94332255ff746698af0adb47b3337a7e8305/nonebot_plugin_htmlrender-0.6.7-py3-none-any.whl", hash = "sha256:d782f20dbfd7573944ccd3e4dff2c69daaee8aa5e6f78443ef94057d4126e252", size = 1064240, upload-time = "2025-08-19T03:41:07.025Z" },
 ]
 
 [[package]]
