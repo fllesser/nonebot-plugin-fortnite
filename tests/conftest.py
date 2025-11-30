@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 
-import nonebot
-from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 import pytest
+import nonebot
 from pytest_asyncio import is_async_test
+from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
 if Path(".env.dev").exists():
     os.environ["ENVIRONMENT"] = "dev"

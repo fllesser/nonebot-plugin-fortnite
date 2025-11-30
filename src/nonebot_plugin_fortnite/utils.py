@@ -2,8 +2,8 @@ import asyncio
 from pathlib import Path
 
 import aiofiles
-from nonebot import logger
 from PIL import Image
+from nonebot import logger
 
 
 async def save_img(img: Image.Image, path: Path, format: str = "PNG"):

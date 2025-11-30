@@ -8,8 +8,8 @@ on:
     paths:
       - "src/**"
       - "tests/**"
-      - "pyproject.toml"
       - "uv.lock"
+      - "pyproject.toml"
       - ".github/workflows/ci.yml"
 
 jobs:
@@ -18,6 +18,23 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: crate-ci/typos@master
+
+  basedpyright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          python-version: "3.12"
+          version: "latest"
+
+      - name: Install Dependencies
+        run: uv sync --locked
+
+      - name: Run Basedpyright
+        run: uvx basedpyright
 
   test:
     name: Test
@@ -49,8 +66,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           version: "latest"
 
-      - name: Install Dependencies for test group
-        run: uv sync --no-dev --locked
+      - name: Install Dependencies
+        run: uv sync --locked
 
       - name: Install Playwright
         run: uv run playwright install chromium-headless-shell --with-deps

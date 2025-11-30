@@ -1,4 +1,4 @@
-from nonebot import get_driver, require
+from nonebot import require, get_driver
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
@@ -14,7 +14,7 @@ from .config import Config
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
-    description="堡垒之夜战绩，季卡，商城，vb图查询",
+    description="堡垒之夜战绩, 季卡, 商城, vb图查询",
     usage="季卡/生涯季卡/战绩/生涯战绩/商城/vb图",
     type="application",
     config=Config,
@@ -35,13 +35,13 @@ async def check_resources():
     import asyncio
     from pathlib import Path
 
-    from .config import CHINESE_FONT_PATH, GG_FONT_PATH, STATS_BG_PATH, VB_FONT_PATH
+    from .config import GG_FONT_PATH, VB_FONT_PATH, STATS_BG_PATH, CHINESE_FONT_PATH
 
     paths = [CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH, STATS_BG_PATH]
 
     async def dwonload_file(path: Path):
-        import aiofiles
         import httpx
+        import aiofiles
 
         url = f"https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/resources/{path.name}"
         logger.info(f"文件 {path.name} 不存在，开始从 {url} 下载...")
@@ -90,12 +90,12 @@ async def _():
 
 import re
 
-from arclet.alconna import Alconna, Args, Arparma
 from nonebot import on_startswith
+from arclet.alconna import Args, Alconna, Arparma
 from nonebot.permission import SUPERUSER
-from nonebot_plugin_alconna import AlconnaMatcher, Match, on_alconna
-from nonebot_plugin_alconna.uniseg import Image, Text, UniMessage
 from nonebot_plugin_uninfo import Uninfo
+from nonebot_plugin_alconna import Match, AlconnaMatcher, on_alconna
+from nonebot_plugin_alconna.uniseg import Text, Image, UniMessage
 
 timewindow_prefix = ["生涯", ""]
 name_args = Args["name?", str]

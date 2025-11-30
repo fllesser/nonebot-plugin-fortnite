@@ -1,7 +1,7 @@
-from fake import fake_group_message_event_v11 as fake_gme
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-from nonebug import App
 import pytest
+from fake import fake_group_message_event_v11 as fake_gme
+from nonebug import App
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
 
 async def test_load():
@@ -76,8 +76,8 @@ async def test_stats_matcher(app: App):
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
     from nonebot_plugin_fortnite import stats_alc
-    from nonebot_plugin_fortnite.config import fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
+    from nonebot_plugin_fortnite.config import fconfig
 
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
@@ -146,8 +146,8 @@ async def test_stats_matcher(app: App):
 
 
 async def test_stats_func():
-    from nonebot_plugin_fortnite.config import fconfig
     from nonebot_plugin_fortnite.stats import get_stats_image
+    from nonebot_plugin_fortnite.config import fconfig
 
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
