@@ -1,16 +1,16 @@
-import asyncio
-from contextlib import ExitStack
-from pathlib import Path
 import time
+import asyncio
+from pathlib import Path
+from contextlib import ExitStack
 
+from PIL import Image, ImageDraw, ImageFont
 from nonebot.log import logger
+from playwright.async_api import Route
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
-from PIL import Image, ImageDraw, ImageFont
-from playwright.async_api import Route
 
-from .config import VB_FONT_PATH, cache_dir, data_dir
 from .utils import retry
+from .config import VB_FONT_PATH, data_dir, cache_dir
 
 VB_FILE = data_dir / "vb.png"
 

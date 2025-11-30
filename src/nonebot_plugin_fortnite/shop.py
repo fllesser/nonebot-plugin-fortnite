@@ -4,8 +4,8 @@ from pathlib import Path
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
-from .config import GG_FONT_PATH, data_dir
 from .utils import retry
+from .config import GG_FONT_PATH, data_dir
 
 SHOP_FILE = data_dir / "shop.png"
 

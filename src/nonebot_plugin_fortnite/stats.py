@@ -1,17 +1,17 @@
 import asyncio
 import hashlib
 from io import BytesIO
-from pathlib import Path
 from typing import Any
+from pathlib import Path
 
-import aiofiles
-from fortnite_api import Client
-from fortnite_api.enums import StatsImageType, TimeWindow
-from fortnite_api.errors import FortniteAPIException
 import httpx
+import aiofiles
 from PIL import Image, ImageDraw, ImageFont
+from fortnite_api import Client
+from fortnite_api.enums import TimeWindow, StatsImageType
+from fortnite_api.errors import FortniteAPIException
 
-from .config import CHINESE_FONT_PATH, cache_dir, fconfig
+from .config import CHINESE_FONT_PATH, fconfig, cache_dir
 
 API_KEY: str | None = fconfig.fortnite_api_key
 
