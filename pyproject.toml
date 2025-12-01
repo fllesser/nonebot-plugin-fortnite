@@ -76,7 +76,8 @@ exclude_lines = [
 plugins = ["nonebot_plugin_fortnite"]
 
 [tool.poe.tasks]
-test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
+test-matcher = "pytest tests/test_matcher.py --cov=src --cov-report xml --junitxml=./junit.xml"
+test-screenshot = "pytest tests/test_screenshot.py --cov=src --cov-report xml --junitxml=./junit.xml"
 bump = "bump-my-version bump"
 show-bump = "bump-my-version show-bump"
 

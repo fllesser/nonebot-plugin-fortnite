@@ -36,8 +36,8 @@ jobs:
       - name: Run Basedpyright
         run: uvx basedpyright
 
-  test:
-    name: Test
+  test-screenshot:
+    name: Test Screenshot
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -73,7 +73,54 @@ jobs:
         run: uv run playwright install chromium-headless-shell --with-deps
 
       - name: Run Pytest
-        run: uv run poe test
+        run: uv run poe test-screenshot
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          env_vars: PYTHON_VERSION
+          use_oidc: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          env_vars: PYTHON_VERSION
+          use_oidc: true
+
+  test-matcher:
+    name: Test Matcher
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    concurrency:
+      group: test-coverage-${{ github.ref }}-3.12
+      cancel-in-progress: true
+
+    env:
+      UV_NO_SYNC: 1
+      FORTNITE_API_KEY: ${{ secrets.FORTNITE_API_KEY }}
+      PYTHON_VERSION: "3.12"
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          python-version: ${{ env.PYTHON_VERSION }}
+          version: "latest"
+
+      - name: Install Dependencies
+        run: uv sync --locked
+
+      - name: Install Playwright
+        run: uv run playwright install chromium-headless-shell --with-deps
+
+      - name: Run Pytest
+        run: uv run poe test-matcher
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
