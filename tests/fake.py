@@ -1,3 +1,4 @@
+from random import randint
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
@@ -22,7 +23,7 @@ def fake_group_message_event_v11(**field) -> "GroupMessageEventV11":
         user_id: int = 10
         message_type: Literal["group"] = "group"
         group_id: int = 10000
-        message_id: int = 1
+        message_id: int = randint(1, 1000000)
         message: Message = Message("test")
         raw_message: str = "test"
         font: int = 0
