@@ -20,9 +20,9 @@ def fake_group_message_event_v11(**field) -> "GroupMessageEventV11":
         self_id: int = 1
         post_type: Literal["message"] = "message"
         sub_type: str = "normal"
-        user_id: int = 10
+        user_id: int = randint(1, 1000000)
         message_type: Literal["group"] = "group"
-        group_id: int = 10000
+        group_id: int = randint(1, 1000000)
         message_id: int = randint(1, 1000000)
         message: Message = Message("test")
         raw_message: str = "test"

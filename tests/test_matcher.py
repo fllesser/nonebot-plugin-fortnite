@@ -3,45 +3,50 @@ from fake import fake_group_message_event_v11 as fake_gme
 from nonebug import App
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
+NAME = "红桃QAQ"
+GROUP_INFO = {
+    "group_name": "测试群",
+    "group_memo": "测试群",
+    "member_count": 100,
+    "max_member_count": 2000,
+}
+GROUP_MEMBER_INFO = {
+    "nickname": NAME,
+    "card": f"id:{NAME}",
+    "role": "member",
+    "level": 100,
+}
 
-async def test_battle_pass_matcher(app: App):
+
+async def test_battle_pass_with_nickname(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
-    from nonebot_plugin_fortnite import battle_pass_alc
-    from nonebot_plugin_fortnite.stats import get_level
+    from nonebot_plugin_fortnite import stats_alc
+    from nonebot_plugin_fortnite.stats import get_stats_image
     from nonebot_plugin_fortnite.config import fconfig
 
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
-    commands = ["季卡", "生涯季卡"]
-    msg_events = [fake_gme(message=cmd) for cmd in commands]
-
+    cmd = "季卡"
+    event = fake_gme(message=cmd)
     group_info = {
-        "group_id": msg_events[0].group_id,
-        "group_name": "测试群",
-        "group_memo": "测试群",
-        "member_count": 100,
-        "max_member_count": 2000,
+        "group_id": event.group_id,
+        **GROUP_INFO,
     }
-
     group_member_info = {
-        "user_id": msg_events[0].user_id,
-        "group_id": msg_events[0].group_id,
-        "nickname": "红桃QAQ",
-        "card": "id:红桃QAQ",
-        "role": "member",
-        "level": 100,
+        "user_id": event.user_id,
+        "group_id": event.group_id,
+        **GROUP_MEMBER_INFO,
     }
 
-    async with app.test_matcher(battle_pass_alc) as ctx:
+    async with app.test_matcher(stats_alc) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = msg_events[0]
         ctx.receive_event(bot, event)
-        level = await get_level("红桃QAQ", commands[0])
+        stats_file = await get_stats_image(NAME, cmd)
         ctx.should_call_api(
             "get_group_info",
             data={"group_id": event.group_id},
@@ -58,14 +63,15 @@ async def test_battle_pass_matcher(app: App):
         )
         ctx.should_call_send(
             event,
-            Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."),
+            Message(f"正在查询 {NAME} 的{cmd}，请稍后..."),
             result=None,
             bot=bot,
         )
 
+        image = MessageSegment.image(stats_file)
         ctx.should_call_send(
             event,
-            Message(level),
+            Message(image),
             result=None,
             bot=bot,
         )
@@ -76,12 +82,54 @@ async def test_battle_pass_matcher(app: App):
             result=None,
         )
 
-        event = msg_events[1]
+
+async def test_battle_pass_with_arg_name(app: App):
+    import nonebot
+    from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
+
+    from nonebot_plugin_fortnite import stats_alc
+    from nonebot_plugin_fortnite.stats import get_level
+    from nonebot_plugin_fortnite.config import fconfig
+
+    if fconfig.fortnite_api_key is None:
+        pytest.skip("api_key 未设置，跳过测试")
+
+    cmd = "生涯季卡"
+    event = fake_gme(message=f"{cmd} {NAME}")
+    group_info = {
+        "group_id": event.group_id,
+        **GROUP_INFO,
+    }
+    group_member_info = {
+        "user_id": event.user_id,
+        "group_id": event.group_id,
+        **GROUP_MEMBER_INFO,
+    }
+
+    async with app.test_matcher(stats_alc) as ctx:
+        adapter = nonebot.get_adapter(OnebotV11Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         ctx.receive_event(bot, event)
-        level = await get_level("红桃QAQ", commands[1])
+        level = await get_level(NAME, cmd)
+        ctx.should_call_api(
+            "get_group_info",
+            data={"group_id": event.group_id},
+            result=group_info,
+        )
+
+        ctx.should_call_api(
+            "get_group_member_info",
+            data={
+                "group_id": event.group_id,
+                "user_id": event.user_id,
+                "no_cache": True,
+            },
+            result=group_member_info,
+        )
+
         ctx.should_call_send(
             event,
-            Message(f"正在查询 红桃QAQ 的{commands[1]}，请稍后..."),
+            Message(f"正在查询 {NAME} 的{cmd}，请稍后..."),
             result=None,
             bot=bot,
         )
@@ -100,7 +148,7 @@ async def test_battle_pass_matcher(app: App):
         )
 
 
-async def test_stats_matcher(app: App):
+async def test_stats_with_nickname(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
@@ -111,57 +159,48 @@ async def test_stats_matcher(app: App):
     if fconfig.fortnite_api_key is None:
         pytest.skip("api_key 未设置，跳过测试")
 
-    commands = ["战绩", "生涯战绩"]
-    msg_events = [fake_gme(message=cmd) for cmd in commands]
-
+    cmd = "战绩"
+    event = fake_gme(message=cmd)
     group_info = {
-        "group_id": msg_events[0].group_id,
-        "group_name": "测试群",
-        "group_memo": "测试群",
-        "member_count": 100,
-        "max_member_count": 2000,
+        "group_id": event.group_id,
+        **GROUP_INFO,
     }
-
     group_member_info = {
-        "user_id": msg_events[0].user_id,
-        "group_id": msg_events[0].group_id,
-        "nickname": "红桃QAQ",
-        "card": "id:红桃QAQ",
-        "role": "member",
-        "level": 100,
+        "user_id": event.user_id,
+        "group_id": event.group_id,
+        **GROUP_MEMBER_INFO,
     }
 
     async with app.test_matcher(stats_alc) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        msg_event = msg_events[0]
-        ctx.receive_event(bot, msg_event)
-        stats_file = await get_stats_image("红桃QAQ", commands[0])
+        ctx.receive_event(bot, event)
+        stats_file = await get_stats_image("红桃QAQ", cmd)
         ctx.should_call_api(
             "get_group_info",
-            data={"group_id": msg_event.group_id},
+            data={"group_id": event.group_id},
             result=group_info,
         )
         ctx.should_call_api(
             "get_group_member_info",
             data={
-                "group_id": msg_event.group_id,
-                "user_id": msg_event.user_id,
+                "group_id": event.group_id,
+                "user_id": event.user_id,
                 "no_cache": True,
             },
             result=group_member_info,
         )
         ctx.should_call_send(
-            msg_event,
-            Message(f"正在查询 红桃QAQ 的{commands[0]}，请稍后..."),
+            event,
+            Message(f"正在查询 红桃QAQ 的{cmd}，请稍后..."),
             result=None,
             bot=bot,
         )
 
         image = MessageSegment.image(stats_file)
         ctx.should_call_send(
-            msg_event,
+            event,
             Message(image),
             result=None,
             bot=bot,
@@ -169,16 +208,58 @@ async def test_stats_matcher(app: App):
 
         ctx.should_call_api(
             "delete_msg",
-            data={"message_id": msg_event.message_id},
+            data={"message_id": event.message_id},
             result=None,
         )
 
-        event = msg_events[1]
+
+async def test_stats_with_arg_name(app: App):
+    import nonebot
+    from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
+
+    from nonebot_plugin_fortnite import stats_alc
+    from nonebot_plugin_fortnite.stats import get_stats_image
+    from nonebot_plugin_fortnite.config import fconfig
+
+    if fconfig.fortnite_api_key is None:
+        pytest.skip("api_key 未设置，跳过测试")
+
+    cmd = "生涯战绩"
+    event = fake_gme(message=f"{cmd} {NAME}")
+    group_info = {
+        "group_id": event.group_id,
+        **GROUP_INFO,
+    }
+    group_member_info = {
+        "user_id": event.user_id,
+        "group_id": event.group_id,
+        **GROUP_MEMBER_INFO,
+    }
+
+    async with app.test_matcher(stats_alc) as ctx:
+        adapter = nonebot.get_adapter(OnebotV11Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         ctx.receive_event(bot, event)
-        stats_file = await get_stats_image("红桃QAQ", commands[1])
+        stats_file = await get_stats_image(NAME, cmd)
+        ctx.should_call_api(
+            "get_group_info",
+            data={"group_id": event.group_id},
+            result=group_info,
+        )
+
+        ctx.should_call_api(
+            "get_group_member_info",
+            data={
+                "group_id": event.group_id,
+                "user_id": event.user_id,
+                "no_cache": True,
+            },
+            result=group_member_info,
+        )
+
         ctx.should_call_send(
             event,
-            Message(f"正在查询 红桃QAQ 的{commands[1]}，请稍后..."),
+            Message(f"正在查询 {NAME} 的{cmd}，请稍后..."),
             result=None,
             bot=bot,
         )
