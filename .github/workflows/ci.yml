@@ -43,7 +43,7 @@ jobs:
       id-token: write
       contents: read
     concurrency:
-      group: test-coverage-${{ github.ref }}-${{ matrix.python-version }}
+      group: test-screenshot-coverage-${{ github.ref }}-${{ matrix.python-version }}
       cancel-in-progress: true
 
     strategy:
@@ -95,7 +95,7 @@ jobs:
       id-token: write
       contents: read
     concurrency:
-      group: test-coverage-${{ github.ref }}-3.12
+      group: test-matcher-coverage-${{ github.ref }}
       cancel-in-progress: true
 
     env:
