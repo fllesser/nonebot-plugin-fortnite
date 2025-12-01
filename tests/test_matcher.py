@@ -22,7 +22,7 @@ async def test_battle_pass_with_nickname(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
-    from nonebot_plugin_fortnite import stats_alc
+    from nonebot_plugin_fortnite import battle_pass_alc
     from nonebot_plugin_fortnite.stats import get_stats_image
     from nonebot_plugin_fortnite.config import fconfig
 
@@ -41,7 +41,7 @@ async def test_battle_pass_with_nickname(app: App):
         **GROUP_MEMBER_INFO,
     }
 
-    async with app.test_matcher(stats_alc) as ctx:
+    async with app.test_matcher(battle_pass_alc) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -87,7 +87,7 @@ async def test_battle_pass_with_arg_name(app: App):
     import nonebot
     from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 
-    from nonebot_plugin_fortnite import stats_alc
+    from nonebot_plugin_fortnite import battle_pass_alc
     from nonebot_plugin_fortnite.stats import get_level
     from nonebot_plugin_fortnite.config import fconfig
 
@@ -106,7 +106,7 @@ async def test_battle_pass_with_arg_name(app: App):
         **GROUP_MEMBER_INFO,
     }
 
-    async with app.test_matcher(stats_alc) as ctx:
+    async with app.test_matcher(battle_pass_alc) as ctx:
         adapter = nonebot.get_adapter(OnebotV11Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         ctx.receive_event(bot, event)
