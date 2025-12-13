@@ -71,7 +71,7 @@ async def check_resources():
     minute=5,
     misfire_grace_time=300,
 )
-async def _():
+async def daily_update():
     logger.info("开始更新商城/VB图...")
     try:
         await shop.update_shop_img()
