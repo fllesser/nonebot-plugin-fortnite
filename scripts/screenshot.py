@@ -3,7 +3,7 @@
 截图脚本，用于 CI 环境中每日自动截图
 """
 
-import sys
+import os
 
 import nonebot
 from nonebot import get_driver
@@ -17,14 +17,10 @@ def main():
     @get_driver().on_startup
     async def _daily_update():
         await daily_update()
-        sys.exit(0)
+        os._exit(0)
 
     nonebot.run()
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except SystemExit as e:
-        if e.code != 0:
-            raise
+    main()
