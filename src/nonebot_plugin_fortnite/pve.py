@@ -3,6 +3,8 @@ import asyncio
 from pathlib import Path
 from contextlib import ExitStack
 
+import httpx
+import aiofiles
 from PIL import Image, ImageDraw, ImageFont
 from nonebot.log import logger
 from playwright.async_api import Route
@@ -13,6 +15,32 @@ from .utils import retry
 from .config import VB_FONT_PATH, data_dir, cache_dir
 
 VB_FILE = data_dir / "vb.png"
+
+
+async def update_vb_img() -> Path:
+    """更新 VB 图片（根据配置决定下载或截图）"""
+    from .config import fconfig
+
+    if fconfig.fortnite_screenshot_from_github:
+        logger.info("从 GitHub 分支下载 VB 图片...")
+        return await download_vb_img_from_github()
+
+    return await screenshot_vb_img()
+
+
+async def download_vb_img_from_github() -> Path:
+    """从 GitHub 分支下载 VB 图片"""
+
+    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/screenshots/vb.png"
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        response.raise_for_status()
+
+    async with aiofiles.open(VB_FILE, "wb") as f:
+        await f.write(response.content)
+
+    return VB_FILE
 
 
 async def screenshot_vb_img() -> Path:

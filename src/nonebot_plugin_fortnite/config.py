@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class Config(BaseModel):
     fortnite_api_key: str | None = None
+    fortnite_screenshot_from_github: bool = False
 
 
 fconfig: Config = get_plugin_config(Config)

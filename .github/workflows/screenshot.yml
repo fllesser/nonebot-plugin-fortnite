@@ -1,0 +1,71 @@
+name: Daily Screenshot
+
+on:
+  schedule:
+    # 每天 UTC 0:02 运行 (北京时间 8:02)
+    - cron: '2 0 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    env:
+      LOCALSTORE_USE_CWD: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          python-version: "3.13"
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Install Playwright browsers
+        run: uv run playwright install chromium-headless-shell --with-deps
+
+      - name: Run screenshot script
+        run: uv run scripts/screenshot.py
+
+      - name: Upload screenshots to branch
+        run: |
+          # 配置 git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 创建/切换到 screenshots 分支
+          git fetch origin screenshots:screenshots 2>/dev/null || git checkout --orphan screenshots
+          git checkout screenshots || git checkout --orphan screenshots
+          
+          # 清空分支并复制新截图
+          git rm -rf . 2>/dev/null || true
+          mkdir -p screenshots
+          cp data/nonebot_plugin_fortnite/*.png screenshots/ 2>/dev/null || true
+          
+          # 添加 README
+          cat > screenshots/README.md << 'EOF'
+          # 堡垒之夜每日截图
+          
+          本分支存储每日自动生成的截图。
+          
+          - **商城截图**: `shop.png`
+          - **VB图截图**: `vb.png`
+          
+          **更新时间**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          ## 访问链接
+          
+          商城截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/screenshots/shop.png`
+          
+          VB图截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/screenshots/vb.png`
+          EOF
+          
+          # 提交并推送
+          git add screenshots/
+          git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || exit 0
+          git push -f origin screenshots

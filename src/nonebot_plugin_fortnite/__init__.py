@@ -24,8 +24,7 @@ __plugin_meta__ = PluginMetadata(
     ),
 )
 
-from .pve import VB_FILE, screenshot_vb_img
-from .shop import SHOP_FILE, screenshot_shop_img
+from . import pve, shop
 from .stats import get_level, get_stats_image
 from .utils import get_size_in_mb
 
@@ -75,14 +74,14 @@ async def check_resources():
 async def _():
     logger.info("开始更新商城/VB图...")
     try:
-        await screenshot_shop_img()
-        size = get_size_in_mb(SHOP_FILE)
+        await shop.update_shop_img()
+        size = get_size_in_mb(shop.SHOP_FILE)
         logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
     except Exception:
         logger.exception("商城更新失败")
     try:
-        await screenshot_vb_img()
-        size = get_size_in_mb(VB_FILE)
+        await pve.update_vb_img()
+        size = get_size_in_mb(pve.VB_FILE)
         logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
     except Exception:
         logger.exception("vb图更新失败")
@@ -157,16 +156,16 @@ shop_matcher = on_startswith("商城")
 
 @shop_matcher.handle()
 async def _():
-    if not SHOP_FILE.exists():
+    if not shop.SHOP_FILE.exists():
         logger.info("商城图不存在, 开始更新商城...")
         try:
-            await screenshot_shop_img()
-            size = get_size_in_mb(SHOP_FILE)
+            await shop.update_shop_img()
+            size = get_size_in_mb(shop.SHOP_FILE)
             logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
         except Exception:
             logger.exception("商城更新失败")
     await UniMessage(
-        Image(path=SHOP_FILE)
+        Image(path=shop.SHOP_FILE)
         + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")
     ).send()
 
@@ -175,7 +174,7 @@ async def _():
 async def _():
     receipt = await UniMessage.text("正在更新商城，请稍后...").send()
     try:
-        file = await screenshot_shop_img()
+        file = await shop.update_shop_img()
         await UniMessage(Text("手动更新商城成功") + Image(path=file)).send()
     except Exception:
         logger.exception("手动更新商城失败")
@@ -189,22 +188,22 @@ vb_matcher = on_startswith(("vb图", "VB图", "Vb图"))
 
 @vb_matcher.handle()
 async def _():
-    if not VB_FILE.exists():
+    if not pve.VB_FILE.exists():
         logger.info("vb 图不存在, 开始更新vb图...")
         try:
-            await screenshot_vb_img()
-            size = get_size_in_mb(VB_FILE)
+            await pve.update_vb_img()
+            size = get_size_in_mb(pve.VB_FILE)
             logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
         except Exception as e:
             logger.warning(f"vb图更新失败: {e}")
-    await UniMessage(Image(path=VB_FILE)).send()
+    await UniMessage(Image(path=pve.VB_FILE)).send()
 
 
 @on_startswith("更新vb图", permission=SUPERUSER).handle()
 async def _():
     receipt = await UniMessage.text("正在更新vb图, 请稍后...").send()
     try:
-        file = await screenshot_vb_img()
+        file = await pve.update_vb_img()
         await UniMessage(Text("手动更新 VB 图成功") + Image(path=file)).send()
     except Exception as e:
         await UniMessage(Text(f"手动更新 VB 图失败 | {e}")).send()

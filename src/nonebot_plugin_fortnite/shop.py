@@ -1,13 +1,41 @@
 import asyncio
 from pathlib import Path
 
+from nonebot import logger
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
 from .utils import retry
-from .config import GG_FONT_PATH, data_dir
+from .config import GG_FONT_PATH, fconfig, data_dir
 
 SHOP_FILE = data_dir / "shop.png"
+
+
+async def update_shop_img() -> Path:
+    """更新商城图片（根据配置决定下载或截图）"""
+
+    if fconfig.fortnite_screenshot_from_github:
+        logger.info("从 GitHub 分支下载商城图片...")
+        return await download_shop_img_from_github()
+
+    return await screenshot_shop_img()
+
+
+async def download_shop_img_from_github() -> Path:
+    """从 GitHub 分支下载商城图片"""
+    import httpx
+    import aiofiles
+
+    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/screenshots/shop.png"
+
+    async with httpx.AsyncClient(timeout=60) as client:
+        response = await client.get(url)
+        response.raise_for_status()
+
+    async with aiofiles.open(SHOP_FILE, "wb") as f:
+        await f.write(response.content)
+
+    return SHOP_FILE
 
 
 async def screenshot_shop_img() -> Path:
