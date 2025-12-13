@@ -10,8 +10,6 @@ from nonebot import get_driver
 
 
 def main():
-    """运行截图任务"""
-    # 导入必要的模块
     nonebot.init()
     nonebot.load_plugin("nonebot_plugin_fortnite")
     from nonebot_plugin_fortnite import daily_update
@@ -25,4 +23,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit as e:
+        if e.code != 0:
+            raise
