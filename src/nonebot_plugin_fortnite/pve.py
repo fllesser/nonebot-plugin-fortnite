@@ -23,8 +23,8 @@ async def update_vb_img():
     if fconfig.fortnite_screenshot_from_github:
         logger.info("从 GitHub 分支下载 VB 图片...")
         await download_vb_img_from_github()
-
-    await screenshot_vb_img()
+    else:
+        await screenshot_vb_img()
     size = get_size_in_mb(VB_FILE)
     logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
 
