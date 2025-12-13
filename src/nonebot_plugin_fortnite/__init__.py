@@ -75,14 +75,10 @@ async def daily_update():
     logger.info("开始更新商城/VB图...")
     try:
         await shop.update_shop_img()
-        size = get_size_in_mb(shop.SHOP_FILE)
-        logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
     except Exception:
         logger.exception("商城更新失败")
     try:
         await pve.update_vb_img()
-        size = get_size_in_mb(pve.VB_FILE)
-        logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
     except Exception:
         logger.exception("vb图更新失败")
 
@@ -174,8 +170,8 @@ async def _():
 async def _():
     receipt = await UniMessage.text("正在更新商城，请稍后...").send()
     try:
-        file = await shop.update_shop_img()
-        await UniMessage(Text("手动更新商城成功") + Image(path=file)).send()
+        await shop.update_shop_img()
+        await UniMessage(Text("手动更新商城成功") + Image(path=shop.SHOP_FILE)).send()
     except Exception:
         logger.exception("手动更新商城失败")
         await UniMessage(Text("手动更新商城失败")).send()
@@ -203,8 +199,8 @@ async def _():
 async def _():
     receipt = await UniMessage.text("正在更新vb图, 请稍后...").send()
     try:
-        file = await pve.update_vb_img()
-        await UniMessage(Text("手动更新 VB 图成功") + Image(path=file)).send()
+        await pve.update_vb_img()
+        await UniMessage(Text("手动更新 VB 图成功") + Image(path=pve.VB_FILE)).send()
     except Exception as e:
         await UniMessage(Text(f"手动更新 VB 图失败 | {e}")).send()
     finally:
