@@ -29,11 +29,12 @@ async def download_shop_img_from_github() -> Path:
     url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/screenshots/shop.png"
 
     async with httpx.AsyncClient(timeout=60) as client:
-        response = await client.get(url)
-        response.raise_for_status()
-
-    async with aiofiles.open(SHOP_FILE, "wb") as f:
-        await f.write(response.content)
+        async with client.stream("GET", url) as response:
+            response.raise_for_status()
+            # 流式写入文件
+            async with aiofiles.open(SHOP_FILE, "wb") as f:
+                async for chunk in response.aiter_bytes():
+                    await f.write(chunk)
 
     return SHOP_FILE
 
