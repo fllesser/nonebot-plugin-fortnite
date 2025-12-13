@@ -18,4 +18,3 @@ data_dir: Path = store.get_plugin_data_dir()
 CHINESE_FONT_PATH: Path = data_dir / "SourceHanSansSC-Bold-2.otf"
 GG_FONT_PATH: Path = data_dir / "burbankbigregular-black.woff2"
 VB_FONT_PATH: Path = data_dir / "LuckiestGuy.woff"
-STATS_BG_PATH: Path = data_dir / "stats_bg.png"

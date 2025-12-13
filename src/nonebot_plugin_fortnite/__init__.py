@@ -34,9 +34,9 @@ async def check_resources():
     import asyncio
     from pathlib import Path
 
-    from .config import GG_FONT_PATH, VB_FONT_PATH, STATS_BG_PATH, CHINESE_FONT_PATH
+    from .config import GG_FONT_PATH, VB_FONT_PATH, CHINESE_FONT_PATH
 
-    paths = [CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH, STATS_BG_PATH]
+    paths = [CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH]
 
     async def dwonload_file(path: Path):
         import httpx
