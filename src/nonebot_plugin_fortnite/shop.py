@@ -27,7 +27,7 @@ async def download_shop_img_from_github():
     import httpx
     import aiofiles
 
-    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/screenshots/shop.png"
+    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/shop.png"
 
     async with httpx.AsyncClient(timeout=60) as client:
         async with client.stream("GET", url) as response:

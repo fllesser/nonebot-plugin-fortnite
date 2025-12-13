@@ -32,7 +32,7 @@ async def update_vb_img():
 async def download_vb_img_from_github():
     """从 GitHub 分支下载 VB 图片"""
 
-    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/screenshots/vb.png"
+    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/vb.png"
 
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.get(url)

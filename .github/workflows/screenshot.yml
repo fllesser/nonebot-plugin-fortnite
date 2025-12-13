@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
     env:
+      TZ: "Asia/Shanghai"
       LOCALSTORE_USE_CWD: true
 
     steps:
@@ -46,11 +47,10 @@ jobs:
 
           # 清空分支并复制新截图
           git rm -rf . 2>/dev/null || true
-          mkdir -p screenshots
-          cp data/nonebot_plugin_fortnite/*.png screenshots/ 2>/dev/null || true
+          cp data/nonebot_plugin_fortnite/*.png ./ 2>/dev/null || true
 
           # 添加 README
-          cat > screenshots/README.md << 'EOF'
+          cat > README.md << 'EOF'
           # 堡垒之夜每日截图
 
           本分支存储每日自动生成的截图。
@@ -58,16 +58,14 @@ jobs:
           - **商城截图**: `shop.png`
           - **VB图截图**: `vb.png`
 
-          **更新时间**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-
           ## 访问链接
 
-          商城截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/screenshots/shop.png`
+          商城截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/shop.png`
 
-          VB图截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/screenshots/vb.png`
+          VB图截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/vb.png`
           EOF
 
           # 提交并推送
-          git add screenshots/
+          git add .
           git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || exit 0
           git push -f origin screenshots
