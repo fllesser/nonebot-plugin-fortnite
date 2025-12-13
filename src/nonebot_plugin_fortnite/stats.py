@@ -3,6 +3,7 @@ import hashlib
 from io import BytesIO
 from typing import Any
 from pathlib import Path
+from functools import cache
 
 import httpx
 import aiofiles
@@ -14,6 +15,18 @@ from fortnite_api.errors import FortniteAPIException
 from .config import CHINESE_FONT_PATH, fconfig, cache_dir
 
 API_KEY: str | None = fconfig.fortnite_api_key
+STATS_BG_PATH = Path(__file__).parent / "resources" / "stats_bg.png"
+
+
+@cache
+def create_gradient_image_new() -> Image.Image:
+    """从底图裁剪渐变图片"""
+    left, top, right, bottom = 26, 90, 423, 230
+
+    with Image.open(STATS_BG_PATH) as img:
+        gradient_img = img.crop((left, top, right, bottom))
+        gradient_img.load()
+        return gradient_img
 
 
 def handle_fortnite_api_exception(e: FortniteAPIException) -> str:
@@ -102,22 +115,6 @@ def contains_chinese(text: str) -> bool:
 
 async def process_image_with_chinese(file: BytesIO, name: str) -> BytesIO:
     return await asyncio.to_thread(_process_image_with_chinese, file, name)
-
-
-from functools import cache
-
-
-@cache
-def create_gradient_image_new() -> Image.Image:
-    """从底图裁剪渐变图片"""
-    from .config import STATS_BG_PATH
-
-    left, top, right, bottom = 26, 90, 423, 230
-
-    with Image.open(STATS_BG_PATH) as img:
-        gradient_img = img.crop((left, top, right, bottom))
-        gradient_img.load()
-        return gradient_img
 
 
 def _process_image_with_chinese(bytes_io: BytesIO, name: str) -> BytesIO:
