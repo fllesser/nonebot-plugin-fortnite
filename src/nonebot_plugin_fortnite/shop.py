@@ -1,27 +1,28 @@
 import asyncio
-from pathlib import Path
 
 from nonebot import logger
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
-from .utils import retry
+from .utils import retry, get_size_in_mb
 from .config import GG_FONT_PATH, fconfig, data_dir
 
 SHOP_FILE = data_dir / "shop.png"
 
 
-async def update_shop_img() -> Path:
+async def update_shop_img():
     """更新商城图片（根据配置决定下载或截图）"""
 
     if fconfig.fortnite_screenshot_from_github:
-        logger.info("从 GitHub 分支下载商城图片...")
-        return await download_shop_img_from_github()
+        logger.info("从 GitHub 下载商城图片...")
+        await download_shop_img_from_github()
+    else:
+        await screenshot_shop_img()
+    size = get_size_in_mb(SHOP_FILE)
+    logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
 
-    return await screenshot_shop_img()
 
-
-async def download_shop_img_from_github() -> Path:
+async def download_shop_img_from_github():
     """从 GitHub 分支下载商城图片"""
     import httpx
     import aiofiles
@@ -36,10 +37,8 @@ async def download_shop_img_from_github() -> Path:
                 async for chunk in response.aiter_bytes():
                     await f.write(chunk)
 
-    return SHOP_FILE
 
-
-async def screenshot_shop_img() -> Path:
+async def screenshot_shop_img():
     # url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
     headers = {
         "User-Agent": (
@@ -65,7 +64,6 @@ async def screenshot_shop_img() -> Path:
     async with get_new_page(device_scale_factor=1, extra_http_headers=headers) as page:
         await _screenshot_shop_img(page)
     await add_update_time()
-    return SHOP_FILE
 
 
 @retry(3, 10)

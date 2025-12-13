@@ -1,6 +1,5 @@
 import time
 import asyncio
-from pathlib import Path
 from contextlib import ExitStack
 
 import httpx
@@ -11,24 +10,26 @@ from playwright.async_api import Route
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
-from .utils import retry
+from .utils import retry, get_size_in_mb
 from .config import VB_FONT_PATH, data_dir, cache_dir
 
 VB_FILE = data_dir / "vb.png"
 
 
-async def update_vb_img() -> Path:
+async def update_vb_img():
     """更新 VB 图片（根据配置决定下载或截图）"""
     from .config import fconfig
 
     if fconfig.fortnite_screenshot_from_github:
         logger.info("从 GitHub 分支下载 VB 图片...")
-        return await download_vb_img_from_github()
+        await download_vb_img_from_github()
 
-    return await screenshot_vb_img()
+    await screenshot_vb_img()
+    size = get_size_in_mb(VB_FILE)
+    logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
 
 
-async def download_vb_img_from_github() -> Path:
+async def download_vb_img_from_github():
     """从 GitHub 分支下载 VB 图片"""
 
     url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/screenshots/vb.png"
@@ -40,14 +41,11 @@ async def download_vb_img_from_github() -> Path:
     async with aiofiles.open(VB_FILE, "wb") as f:
         await f.write(response.content)
 
-    return VB_FILE
 
-
-async def screenshot_vb_img() -> Path:
+async def screenshot_vb_img():
     async with get_new_page(device_scale_factor=1) as page:
         await _screenshot_vb_img(page)
     await combine_imgs()
-    return VB_FILE
 
 
 _SELECTOR_MAP = {
