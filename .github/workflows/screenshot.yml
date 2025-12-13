@@ -66,6 +66,6 @@ jobs:
           EOF
 
           # 提交并推送
-          git add .
+          git add shop.png vb.png README.md
           git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || exit 0
           git push -f origin screenshots
