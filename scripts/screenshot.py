@@ -15,7 +15,7 @@ def main():
     from nonebot_plugin_fortnite import daily_update
 
     @get_driver().on_startup
-    async def _daily_update():
+    async def _():
         await daily_update()
         os._exit(0)
 

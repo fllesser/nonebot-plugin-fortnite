@@ -9,6 +9,8 @@ on:
 jobs:
   screenshot:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       LOCALSTORE_USE_CWD: true
 
