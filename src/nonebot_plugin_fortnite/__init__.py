@@ -1,4 +1,7 @@
-from nonebot import require, get_driver
+import re
+import asyncio
+
+from nonebot import require, get_driver, on_command, on_startswith
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
@@ -24,9 +27,7 @@ __plugin_meta__ = PluginMetadata(
     ),
 )
 
-from . import pve, shop
-from .stats import get_level, get_stats_image
-from .utils import get_size_in_mb
+from . import pve, shop, stats, utils
 
 
 @get_driver().on_startup
@@ -53,7 +54,7 @@ async def check_resources():
             async with aiofiles.open(path, "wb") as f:
                 await f.write(font_data)
 
-            size = get_size_in_mb(path)
+            size = utils.get_size_in_mb(path)
             logger.success(f"文件 {path.name} 下载成功，文件大小: {size:.2f} MB")
         except Exception:
             logger.exception("文件下载失败")
@@ -65,11 +66,15 @@ async def check_resources():
 @scheduler.scheduled_job(
     "cron",
     id="fortnite",
-    hour="8,9,10",
-    minute="5,35",
+    hour="8",
+    minute="0",
     misfire_grace_time=300,
 )
 async def daily_update():
+    if fconfig.github_token is not None:
+        await utils.dispatch_screenshot_action()
+        await asyncio.sleep(120)
+
     logger.info("开始更新商城/VB图...")
     try:
         await shop.update_shop_img()
@@ -81,9 +86,6 @@ async def daily_update():
         logger.exception("vb图更新失败")
 
 
-import re
-
-from nonebot import on_startswith
 from arclet.alconna import Args, Alconna, Arparma
 from nonebot.permission import SUPERUSER
 from nonebot_plugin_uninfo import Uninfo
@@ -92,7 +94,6 @@ from nonebot_plugin_alconna.uniseg import Text, Image, UniMessage
 
 timewindow_prefix = ["生涯", ""]
 name_args = Args["name?", str]
-
 
 battle_pass_alc = on_alconna(Alconna(timewindow_prefix, "季卡", name_args))
 stats_alc = on_alconna(Alconna(timewindow_prefix, "战绩", name_args))
@@ -124,7 +125,7 @@ name_prompt = UniMessage.template(
 async def _(arp: Arparma, name: str):
     header: str = arp.header_match.result
     receipt = await UniMessage.text(f"正在查询 {name} 的{header}，请稍后...").send()
-    level_info = await get_level(name, header)
+    level_info = await stats.get_level(name, header)
     await UniMessage(Text(level_info)).send()
     await receipt.recall(delay=1)
 
@@ -134,7 +135,7 @@ async def _(arp: Arparma, name: str):
     header: str = arp.header_match.result
     receipt = await UniMessage.text(f"正在查询 {name} 的{header}，请稍后...").send()
     try:
-        file = await get_stats_image(name, header)
+        file = await stats.get_stats_image(name, header)
     except Exception as e:
         if isinstance(e, ValueError):
             await UniMessage(Text(str(e))).finish()
@@ -154,7 +155,7 @@ async def _():
         logger.info("商城图不存在, 开始更新商城...")
         try:
             await shop.update_shop_img()
-            size = get_size_in_mb(shop.SHOP_FILE)
+            size = utils.get_size_in_mb(shop.SHOP_FILE)
             logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
         except Exception:
             logger.exception("商城更新失败")
@@ -186,7 +187,7 @@ async def _():
         logger.info("vb 图不存在, 开始更新vb图...")
         try:
             await pve.update_vb_img()
-            size = get_size_in_mb(pve.VB_FILE)
+            size = utils.get_size_in_mb(pve.VB_FILE)
             logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
         except Exception as e:
             logger.warning(f"vb图更新失败: {e}")
@@ -203,3 +204,12 @@ async def _():
         await UniMessage(Text(f"手动更新 VB 图失败 | {e}")).send()
     finally:
         await receipt.recall(delay=1)
+
+
+if fconfig.github_token is not None:
+    action_matcher = on_command("fnaction", permission=SUPERUSER)
+
+    @action_matcher.handle()
+    async def _():
+        await utils.dispatch_screenshot_action()
+        await UniMessage(Text("手动触发截图工作流成功")).send()
