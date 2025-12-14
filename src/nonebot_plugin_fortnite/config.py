@@ -14,7 +14,7 @@ GITHUB_RAW = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite
 class Config(BaseModel):
     fortnite_api_key: str | None = None
     fortnite_screenshot_from_github: bool = False
-    fortnite_github_proxy_url: str = "https://proxy.pipers.cn"
+    fortnite_github_proxy_url: str = "https://gh-proxy.org"
     fortnite_github_token: str | None = None
 
     @property
