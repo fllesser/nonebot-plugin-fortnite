@@ -1,5 +1,6 @@
 import re
 import asyncio
+from pathlib import Path
 
 from nonebot import require, get_driver, on_command, on_startswith
 from nonebot.log import logger
@@ -13,7 +14,7 @@ require("nonebot_plugin_localstore")
 require("nonebot_plugin_htmlrender")
 from nonebot_plugin_apscheduler import scheduler
 
-from .config import Config, fconfig
+from .config import CHINESE_FONT_PATH, Config, fconfig
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -32,17 +33,12 @@ from . import pve, shop, stats, utils
 
 @get_driver().on_startup
 async def check_resources():
-    import asyncio
-    from pathlib import Path
-
-    from .config import CHINESE_FONT_PATH
+    import httpx
+    import aiofiles
 
     paths = [CHINESE_FONT_PATH]
 
     async def dwonload_file(path: Path):
-        import httpx
-        import aiofiles
-
         url = f"{fconfig.raw_base_url}/master/resources/{path.name}"
         logger.info(f"文件 {path.name} 不存在，开始从 {url} 下载...")
         try:
