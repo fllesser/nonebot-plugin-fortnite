@@ -195,3 +195,14 @@ async def test_stats_with_arg_name(app: App):
             data={"message_id": event.message_id},
             result=None,
         )
+
+
+async def test_stats_func():
+    from nonebot_plugin_fortnite.stats import get_stats_image
+    from nonebot_plugin_fortnite.config import fconfig
+
+    if fconfig.fortnite_api_key is None:
+        pytest.skip("api_key 未设置，跳过测试")
+
+    file = await get_stats_image("别打好疼", "生涯")
+    assert file.exists()

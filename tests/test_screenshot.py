@@ -1,4 +1,3 @@
-import pytest
 from fake import fake_group_message_event_v11 as fake_gme
 from nonebug import App
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
@@ -63,17 +62,6 @@ async def test_shop_img(app: App):
             )
             ctx.should_finished()
     assert shop.SHOP_FILE.exists()
-
-
-async def test_stats_func():
-    from nonebot_plugin_fortnite.stats import get_stats_image
-    from nonebot_plugin_fortnite.config import fconfig
-
-    if fconfig.fortnite_api_key is None:
-        pytest.skip("api_key 未设置，跳过测试")
-
-    file = await get_stats_image("别打好疼", "生涯")
-    assert file.exists()
 
 
 async def test_check_font():
