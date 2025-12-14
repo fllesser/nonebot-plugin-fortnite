@@ -10,7 +10,7 @@ require("nonebot_plugin_localstore")
 require("nonebot_plugin_htmlrender")
 from nonebot_plugin_apscheduler import scheduler
 
-from .config import Config
+from .config import Config, fconfig
 
 __plugin_meta__ = PluginMetadata(
     name="堡垒之夜游戏插件",
@@ -34,15 +34,15 @@ async def check_resources():
     import asyncio
     from pathlib import Path
 
-    from .config import GG_FONT_PATH, VB_FONT_PATH, CHINESE_FONT_PATH
+    from .config import CHINESE_FONT_PATH
 
-    paths = [CHINESE_FONT_PATH, GG_FONT_PATH, VB_FONT_PATH]
+    paths = [CHINESE_FONT_PATH]
 
     async def dwonload_file(path: Path):
         import httpx
         import aiofiles
 
-        url = f"https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/master/resources/{path.name}"
+        url = f"{fconfig.raw_base_url}/master/resources/{path.name}"
         logger.info(f"文件 {path.name} 不存在，开始从 {url} 下载...")
         try:
             async with httpx.AsyncClient(timeout=60) as client:
@@ -59,16 +59,14 @@ async def check_resources():
             logger.exception("文件下载失败")
             logger.warning(f"请前往仓库下载资源文件到 {path}")
 
-    tasks = [dwonload_file(path) for path in paths if not path.exists()]
-    if len(tasks) > 0:
-        await asyncio.gather(*tasks)
+    await asyncio.gather(*[dwonload_file(path) for path in paths if not path.exists()])
 
 
 @scheduler.scheduled_job(
     "cron",
     id="fortnite",
-    hour=8,
-    minute=5,
+    hour="8,9,10",
+    minute="5,35",
     misfire_grace_time=300,
 )
 async def daily_update():

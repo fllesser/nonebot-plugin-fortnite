@@ -1,5 +1,6 @@
 import time
 import asyncio
+from pathlib import Path
 from contextlib import ExitStack
 
 import httpx
@@ -10,29 +11,32 @@ from playwright.async_api import Route
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
-from .utils import retry, get_size_in_mb
-from .config import VB_FONT_PATH, data_dir, cache_dir
+from . import utils
+from .config import fconfig
 
-VB_FILE = data_dir / "vb.png"
+VB_FILE_NAME = "vb.png"
+VB_FILE = fconfig.data_dir / VB_FILE_NAME
+VB_FONT_PATH = Path(__file__).parent / "resources" / "LuckiestGuy.woff"
 
 
 async def update_vb_img():
     """更新 VB 图片（根据配置决定下载或截图）"""
-    from .config import fconfig
 
     if fconfig.fortnite_screenshot_from_github:
         logger.info("从 GitHub 分支下载 VB 图片...")
         await download_vb_img_from_github()
     else:
         await screenshot_vb_img()
-    size = get_size_in_mb(VB_FILE)
+
+    size = utils.get_size_in_mb(VB_FILE)
     logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
 
 
+@utils.retry(retries=3, delay=10)
 async def download_vb_img_from_github():
     """从 GitHub 分支下载 VB 图片"""
 
-    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/vb.png"
+    url = f"{fconfig.raw_base_url}/screenshots/{VB_FILE_NAME}"
 
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.get(url)
@@ -55,7 +59,7 @@ _SELECTOR_MAP = {
 }
 
 
-@retry(retries=3, delay=10)
+@utils.retry(retries=3, delay=10)
 async def _screenshot_vb_img(page: Page):
     url = "https://freethevbucks.com/timed-missions"
 
@@ -85,7 +89,7 @@ async def _screenshot_vb_img(page: Page):
         locator = page.locator(selector).nth(nth)
         # 检查元素内容是否为空
         content = await locator.inner_html()
-        path = cache_dir / filename
+        path = fconfig.cache_dir / filename
         if content.strip():
             await asyncio.wait_for(locator.screenshot(path=path), timeout=5)
         else:
@@ -100,7 +104,7 @@ async def combine_imgs():
 
 def _combine_imgs():
     # 打开截图文件（如果存在）
-    img_paths = [cache_dir / file for file in _SELECTOR_MAP.keys()]
+    img_paths = [fconfig.cache_dir / file for file in _SELECTOR_MAP.keys()]
     img_paths = [path for path in img_paths if path.exists()]
     if not img_paths:
         raise Exception("所有选择器的截图文件均不存在")
