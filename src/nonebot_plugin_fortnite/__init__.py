@@ -65,8 +65,8 @@ async def check_resources():
 @scheduler.scheduled_job(
     "cron",
     id="fortnite",
-    hour=[8, 9, 10],
-    minute=[5, 35],
+    hour="8,9,10",
+    minute="5,35",
     misfire_grace_time=300,
 )
 async def daily_update():
