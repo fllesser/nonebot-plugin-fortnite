@@ -1,13 +1,16 @@
 import asyncio
+from pathlib import Path
 
 from nonebot import logger
 from nonebot_plugin_htmlrender import get_new_page
 from nonebot_plugin_htmlrender.browser import Page
 
-from .utils import retry, get_size_in_mb
-from .config import GG_FONT_PATH, fconfig, data_dir
+from . import utils
+from .config import fconfig
 
-SHOP_FILE = data_dir / "shop.png"
+SHOP_FILE_NAME = "shop.png"
+SHOP_FILE = fconfig.data_dir / SHOP_FILE_NAME
+GG_FONT_PATH = Path(__file__).parent / "resources" / "burbankbigregular-black.woff2"
 
 
 async def update_shop_img():
@@ -18,16 +21,18 @@ async def update_shop_img():
         await download_shop_img_from_github()
     else:
         await screenshot_shop_img()
-    size = get_size_in_mb(SHOP_FILE)
+
+    size = utils.get_size_in_mb(SHOP_FILE)
     logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
 
 
+@utils.retry(retries=3, delay=10)
 async def download_shop_img_from_github():
     """从 GitHub 分支下载商城图片"""
     import httpx
     import aiofiles
 
-    url = "https://raw.githubusercontent.com/fllesser/nonebot-plugin-fortnite/screenshots/shop.png"
+    url = f"{fconfig.raw_base_url}/screenshots/{SHOP_FILE_NAME}"
 
     async with httpx.AsyncClient(timeout=60) as client:
         async with client.stream("GET", url) as response:
@@ -66,7 +71,7 @@ async def screenshot_shop_img():
     await add_update_time()
 
 
-@retry(3, 10)
+@utils.retry(3, 10)
 async def _screenshot_shop_img(page: Page):
     url = "https://fortnite.gg/shop"
     await page.add_style_tag(

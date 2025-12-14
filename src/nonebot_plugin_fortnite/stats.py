@@ -12,7 +12,7 @@ from fortnite_api import Client
 from fortnite_api.enums import TimeWindow, StatsImageType
 from fortnite_api.errors import FortniteAPIException
 
-from .config import CHINESE_FONT_PATH, fconfig, cache_dir
+from .config import CHINESE_FONT_PATH, fconfig
 
 API_KEY: str | None = fconfig.fortnite_api_key
 STATS_BG_PATH = Path(__file__).parent / "resources" / "stats_bg.png"
@@ -80,7 +80,7 @@ async def get_stats_image(name: str, cmd_header: str) -> Path:
     img_bytes = await get_stats_img_by_url(stats.image.url, stats.user.name)
 
     hash_str = hashlib.md5(f"{name}{cmd_header}".encode()).hexdigest()
-    file_path = cache_dir / f"{hash_str}.png"
+    file_path = fconfig.data_dir / f"{hash_str}.png"
 
     async with aiofiles.open(file_path, "wb") as f:
         await f.write(img_bytes.getvalue())
