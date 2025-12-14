@@ -3,7 +3,7 @@ name: Daily Screenshot
 on:
   schedule:
     # 每天 UTC 0:02 运行 (北京时间 8:02)
-    - cron: "2 0 * * *"
+    - cron: "0 0 * * *"
   workflow_dispatch: # 允许手动触发
 
 jobs:

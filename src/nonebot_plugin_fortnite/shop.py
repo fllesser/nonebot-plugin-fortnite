@@ -34,7 +34,7 @@ async def download_shop_img_from_github():
             response.raise_for_status()
             # 流式写入文件
             async with aiofiles.open(SHOP_FILE, "wb") as f:
-                async for chunk in response.aiter_bytes():
+                async for chunk in response.aiter_bytes(8192):
                     await f.write(chunk)
 
 
