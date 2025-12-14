@@ -209,3 +209,9 @@ if fconfig.github_token is not None:
     async def _():
         await utils.dispatch_screenshot_action()
         await UniMessage(Text("trigger screenshot github workflow successfully")).send()
+        await asyncio.sleep(120)
+
+        await shop.update_shop_img()
+        await pve.update_vb_img()
+
+        await UniMessage(Text("更新商城图, VB 图成功")).send()
