@@ -1,9 +1,21 @@
 import asyncio
 from pathlib import Path
 
+import httpx
 import aiofiles
 from PIL import Image
 from nonebot import logger
+
+from .config import fconfig
+
+
+async def dispatch_screenshot_action():
+    url = "https://api.github.com/repos/fllesser/nonebot-plugin-fortnite/actions/workflows/screenshot.yml/dispatches"
+    headers = {"Authorization": f"token {fconfig.github_token}"}
+    async with httpx.AsyncClient(headers=headers) as client:
+        response = await client.post(url, json={"ref": "master"})
+        response.raise_for_status()
+        logger.info("trigger screenshot github workflow successfully")
 
 
 async def save_img(img: Image.Image, path: Path, format: str = "PNG"):
