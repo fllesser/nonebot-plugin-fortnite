@@ -208,4 +208,4 @@ if fconfig.github_token is not None:
     @action_matcher.handle()
     async def _():
         await utils.dispatch_screenshot_action()
-        await UniMessage(Text("手动触发截图工作流成功")).send()
+        await UniMessage(Text("trigger screenshot github workflow successfully")).send()

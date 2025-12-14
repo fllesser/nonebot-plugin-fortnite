@@ -15,7 +15,7 @@ async def dispatch_screenshot_action():
     async with httpx.AsyncClient(headers=headers) as client:
         response = await client.post(url, json={"ref": "master"})
         response.raise_for_status()
-        logger.info("成功触发仓库截图工作流")
+        logger.info("trigger screenshot github workflow successfully")
 
 
 async def save_img(img: Image.Image, path: Path, format: str = "PNG"):
