@@ -8,6 +8,11 @@ from nonebot import logger
 
 from .config import fconfig
 
+TRIGGER_SCREENSHOT_TIP = (
+    "Trigger screenshot github workflow successfully, you can check the status at "
+    "https://github.com/fllesser/nonebot-plugin-fortnite/actions/workflows/screenshot.yml"
+)
+
 
 async def dispatch_screenshot_action():
     url = "https://api.github.com/repos/fllesser/nonebot-plugin-fortnite/actions/workflows/screenshot.yml/dispatches"
@@ -15,7 +20,8 @@ async def dispatch_screenshot_action():
     async with httpx.AsyncClient(headers=headers) as client:
         response = await client.post(url, json={"ref": "master"})
         response.raise_for_status()
-        logger.info("trigger screenshot github workflow successfully")
+
+    logger.info(TRIGGER_SCREENSHOT_TIP)
 
 
 async def save_img(img: Image.Image, path: Path, format: str = "PNG"):

@@ -76,7 +76,7 @@ else:
 async def daily_update():
     if fconfig.github_token is not None:
         await utils.dispatch_screenshot_action()
-        await asyncio.sleep(120)
+        await asyncio.sleep(90)
 
     logger.info("开始更新商城/VB图...")
     try:
@@ -215,8 +215,8 @@ if fconfig.github_token is not None:
     @action_matcher.handle()
     async def _():
         await utils.dispatch_screenshot_action()
-        await UniMessage(Text("trigger screenshot github workflow successfully")).send()
-        await asyncio.sleep(120)
+        await UniMessage(Text(utils.TRIGGER_SCREENSHOT_TIP)).send()
+        await asyncio.sleep(70)
 
         await shop.update_shop_img()
         await pve.update_vb_img()
