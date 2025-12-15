@@ -76,8 +76,8 @@ jobs:
           path: |
             ~/.cache/ms-playwright
             ~/work/nonebot-plugin-fortnite/nonebot-plugin-fortnite/data/nonebot_plugin_htmlrender
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/uv.lock') }}
-          restore-keys: ${{ runner.os }}-playwright-
+          key: ${{ runner.os }}-playwright-${{ matrix.python-version }}-${{ hashFiles('**/uv.lock') }}
+          restore-keys: ${{ runner.os }}-playwright-${{ matrix.python-version }}-
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
