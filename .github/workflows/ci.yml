@@ -127,9 +127,6 @@ jobs:
       - name: Install Dependencies
         run: uv sync --locked
 
-      - name: Install Playwright
-        run: uv run playwright install chromium-headless-shell --with-deps
-
       - name: Run Pytest
         run: uv run poe test-matcher
 
