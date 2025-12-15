@@ -59,12 +59,19 @@ async def check_resources():
     await asyncio.gather(*[dwonload_file(path) for path in paths if not path.exists()])
 
 
+if fconfig.github_token is None:
+    minute = 2
+else:
+    minute = 0
+
+
 @scheduler.scheduled_job(
     "cron",
-    id="fortnite",
-    hour="8",
-    minute="0",
-    misfire_grace_time=300,
+    id="fortnite-screenshot",
+    hour=8,
+    minute=minute,
+    coalesce=True,
+    misfire_grace_time=60,
 )
 async def daily_update():
     if fconfig.github_token is not None:

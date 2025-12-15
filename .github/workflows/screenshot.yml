@@ -41,12 +41,16 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 创建/切换到 screenshots 分支
-          git fetch origin screenshots:screenshots 2>/dev/null || git checkout --orphan screenshots
-          git checkout screenshots || git checkout --orphan screenshots
+          # 删除远程 screenshots 分支（如果存在）
+          git push origin --delete screenshots 2>/dev/null || true
 
-          # 清空分支并复制新截图
+          # 创建新的孤立分支
+          git checkout --orphan screenshots
+
+          # 清空工作区
           git rm -rf . 2>/dev/null || true
+
+          # 复制新截图
           cp data/nonebot_plugin_fortnite/*.png ./ 2>/dev/null || true
 
           # 添加 README
@@ -67,5 +71,5 @@ jobs:
 
           # 提交并推送
           git add shop.png vb.png README.md
-          git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || exit 0
+          git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
           git push -f origin screenshots
