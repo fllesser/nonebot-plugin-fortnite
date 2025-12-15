@@ -210,7 +210,7 @@ async def _():
 
 
 if fconfig.github_token is not None:
-    action_matcher = on_command("fnaction", permission=SUPERUSER)
+    action_matcher = on_command("更新堡垒", permission=SUPERUSER)
 
     @action_matcher.handle()
     async def _():
@@ -221,4 +221,6 @@ if fconfig.github_token is not None:
         await shop.update_shop_img()
         await pve.update_vb_img()
 
-        await UniMessage(Text("更新商城图, VB 图成功")).send()
+        await UniMessage(
+            Text("更新成功") + Image(path=shop.SHOP_FILE) + Image(path=pve.VB_FILE)
+        ).send()
