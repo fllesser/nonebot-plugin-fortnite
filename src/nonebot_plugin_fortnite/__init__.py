@@ -2,8 +2,7 @@ import re
 import asyncio
 from pathlib import Path
 
-from nonebot import require, get_driver, on_command, on_startswith
-from nonebot.log import logger
+from nonebot import logger, require, get_driver, on_command, on_startswith
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
 
@@ -75,7 +74,7 @@ else:
 )
 async def daily_update():
     if fconfig.github_token is not None:
-        await utils.dispatch_screenshot_action()
+        await utils.trigger_screenshot_action()
         await asyncio.sleep(90)
 
     logger.info("开始更新商城/VB图...")
@@ -214,7 +213,7 @@ if fconfig.github_token is not None:
 
     @action_matcher.handle()
     async def _():
-        await utils.dispatch_screenshot_action()
+        await utils.trigger_screenshot_action()
         await UniMessage(Text(utils.TRIGGER_SCREENSHOT_TIP)).send()
         await asyncio.sleep(70)
 

@@ -9,12 +9,12 @@ from nonebot import logger
 from .config import fconfig
 
 TRIGGER_SCREENSHOT_TIP = (
-    "Trigger screenshot github workflow successfully, you can check the status at "
+    "Trigger screenshot action, "
     "https://github.com/fllesser/nonebot-plugin-fortnite/actions/workflows/screenshot.yml"
 )
 
 
-async def dispatch_screenshot_action():
+async def trigger_screenshot_action():
     url = "https://api.github.com/repos/fllesser/nonebot-plugin-fortnite/actions/workflows/screenshot.yml/dispatches"
     headers = {"Authorization": f"token {fconfig.github_token}"}
     async with httpx.AsyncClient(headers=headers) as client:
