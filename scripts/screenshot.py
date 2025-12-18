@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-截图脚本，用于 CI 环境中每日自动截图
-"""
-
 import os
 
 import nonebot
