@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-fortnite"
-version = "0.6.4"
+version = "0.6.5"
 description = "堡垒之夜插件"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -54,7 +54,7 @@ nonebug = { git = "https://github.com/fllesser/nonebug", rev = "pytest9" }
 [tool.bumpversion]
 tag = true
 commit = true
-current_version = "0.6.4"
+current_version = "0.6.5"
 message = "release: bump vesion from {current_version} to {new_version}"
 
 [[tool.bumpversion.files]]
