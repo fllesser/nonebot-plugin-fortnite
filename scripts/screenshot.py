@@ -11,6 +11,7 @@ def main():
     from nonebot_plugin_apscheduler import scheduler
 
     scheduler.remove_all_jobs()
+    scheduler.shutdown(False)
 
     from nonebot_plugin_fortnite import pve, shop
 
