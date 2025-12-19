@@ -10,13 +10,11 @@ def main():
 
     from nonebot_plugin_apscheduler import scheduler
 
-    scheduler.remove_all_jobs()
-    scheduler.shutdown(False)
-
     from nonebot_plugin_fortnite import pve, shop
 
     @get_driver().on_startup
     async def _():
+        scheduler.shutdown(False)
         await shop.update_shop_img()
         await pve.update_vb_img()
         os._exit(0)
