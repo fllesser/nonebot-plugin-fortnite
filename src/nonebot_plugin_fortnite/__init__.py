@@ -70,7 +70,7 @@ else:
     hour=8,
     minute=minute,
     coalesce=True,
-    misfire_grace_time=60,
+    misfire_grace_time=30,
 )
 async def daily_update():
     if fconfig.github_token is not None:

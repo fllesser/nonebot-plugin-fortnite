@@ -7,6 +7,11 @@ from nonebot import get_driver
 def main():
     nonebot.init()
     nonebot.load_plugin("nonebot_plugin_fortnite")
+
+    from nonebot_plugin_apscheduler import scheduler
+
+    scheduler.remove_all_jobs()
+
     from nonebot_plugin_fortnite import pve, shop
 
     @get_driver().on_startup
