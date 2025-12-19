@@ -23,9 +23,10 @@ async def update_vb_img():
     """更新 VB 图片（根据配置决定下载或截图）"""
 
     if fconfig.fortnite_screenshot_from_github:
-        logger.info("从 GitHub 分支下载 VB 图片...")
+        logger.info("从 GitHub Screenshots 分支下载 VB 图片...")
         await download_vb_img_from_github()
     else:
+        logger.info("从 Fortnite 网站截图 VB 图片...")
         await screenshot_vb_img()
 
     size = utils.get_size_in_mb(VB_FILE)

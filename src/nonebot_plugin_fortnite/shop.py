@@ -17,9 +17,10 @@ async def update_shop_img():
     """更新商城图片（根据配置决定下载或截图）"""
 
     if fconfig.fortnite_screenshot_from_github:
-        logger.info("从 GitHub 下载商城图片...")
+        logger.info("从 GitHub Screenshots 分支下载商城图片...")
         await download_shop_img_from_github()
     else:
+        logger.info("从 Fortnite 网站截图商城图片...")
         await screenshot_shop_img()
 
     size = utils.get_size_in_mb(SHOP_FILE)
