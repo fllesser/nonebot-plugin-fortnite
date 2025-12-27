@@ -48,8 +48,10 @@ def retry(times: int = 3, delay: float = 5):
             for i in range(times):
                 try:
                     return await func(*args, **kwargs)
-                except Exception:
-                    logger.warning(f"Error in {func.__name__}, retry {i + 1}/{times}")
+                except Exception as e:
+                    logger.warning(
+                        f"Error {e} in {func.__name__}, retry {i + 1}/{times}"
+                    )
                     if i == times - 1:
                         raise
                     await asyncio.sleep(delay)
