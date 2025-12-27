@@ -43,7 +43,7 @@ async def download_shop_img_from_github(shop_file: Path):
 
     url = utils.get_github_file_url(shop_file.name)
 
-    async with httpx.AsyncClient(timeout=40) as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         async with client.stream("GET", url) as response:
             response.raise_for_status()
             # 流式写入文件
@@ -86,7 +86,7 @@ async def _screenshot_shop_img(page: Page, shop_file: Path):
     await page.goto(url)
 
     async def wait_for_load():
-        await page.wait_for_load_state("networkidle", timeout=30000)
+        await page.wait_for_load_state("networkidle", timeout=45000)
 
     async def scroll_page():
         for _ in range(20):
