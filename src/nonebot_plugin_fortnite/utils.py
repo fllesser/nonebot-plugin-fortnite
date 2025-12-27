@@ -38,7 +38,7 @@ def get_size_in_mb(path: Path):
     return path.stat().st_size / 1024 / 1024
 
 
-def retry(retries: int = 3, delay: float = 3):
+def retry(retries: int = 3, delay: float = 5):
     from functools import wraps
 
     def decorator(func):
