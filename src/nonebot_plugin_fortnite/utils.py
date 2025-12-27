@@ -1,3 +1,4 @@
+import time
 import asyncio
 from pathlib import Path
 
@@ -38,21 +39,35 @@ def get_size_in_mb(path: Path):
     return path.stat().st_size / 1024 / 1024
 
 
-def retry(retries: int = 3, delay: float = 5):
+def retry(times: int = 3, delay: float = 5):
     from functools import wraps
 
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            for i in range(retries):
+            for i in range(times):
                 try:
                     return await func(*args, **kwargs)
                 except Exception:
-                    logger.warning(f"Error in {func.__name__}, retry {i + 1}/{retries}")
-                    if i == retries - 1:
+                    logger.warning(f"Error in {func.__name__}, retry {i + 1}/{times}")
+                    if i == times - 1:
                         raise
                     await asyncio.sleep(delay)
 
         return wrapper
 
     return decorator
+
+
+def get_utc_day() -> str:
+    """获取当前 UTC 日期字符串，格式为 YYYY-MM-DD"""
+    return time.strftime("%Y-%m-%d", time.gmtime())
+
+
+def get_github_file_url(file_name: str) -> str:
+    return f"{fconfig.raw_base_url}/screenshots/{file_name}"
+
+
+def clear_files_with_prefix(prefix: str):
+    for file in fconfig.data_dir.glob(f"{prefix}*.png"):
+        file.unlink()

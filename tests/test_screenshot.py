@@ -9,8 +9,9 @@ async def test_vb_img(app: App):
 
     from nonebot_plugin_fortnite import pve, vb_matcher
 
-    if pve.VB_FILE.exists():
-        pve.VB_FILE.unlink()
+    vb_file = pve.get_vb_file()
+    if vb_file.exists():
+        vb_file.unlink()
 
     texts = ["vb图", "VB图", "Vb图"]
     msg_events = [fake_gme(message=text) for text in texts]
@@ -20,7 +21,7 @@ async def test_vb_img(app: App):
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         for event in msg_events:
             ctx.receive_event(bot, event)
-            image = MessageSegment.image(pve.VB_FILE)
+            image = MessageSegment.image(vb_file)
             ctx.should_call_send(
                 event,
                 Message(image),
@@ -29,7 +30,7 @@ async def test_vb_img(app: App):
             )
             ctx.should_finished()
 
-    assert pve.VB_FILE.exists()
+    assert vb_file.exists()
 
 
 async def test_shop_img(app: App):
@@ -38,8 +39,9 @@ async def test_shop_img(app: App):
 
     from nonebot_plugin_fortnite import shop, shop_matcher
 
-    if shop.SHOP_FILE.exists():
-        shop.SHOP_FILE.unlink()
+    shop_file = shop.get_shop_file()
+    if shop_file.exists():
+        shop_file.unlink()
 
     texts = ["商城", "商城。。。。"]
     msg_events = [fake_gme(message=text) for text in texts]
@@ -51,7 +53,7 @@ async def test_shop_img(app: App):
             ctx.receive_event(bot, event)
             # assert SHOP_FILE.exists()
             should_send = (
-                MessageSegment.image(shop.SHOP_FILE)
+                MessageSegment.image(shop_file)
                 + "可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买"
             )
             ctx.should_call_send(
@@ -61,7 +63,7 @@ async def test_shop_img(app: App):
                 bot=bot,
             )
             ctx.should_finished()
-    assert shop.SHOP_FILE.exists()
+    assert shop_file.exists()
 
 
 async def test_check_font():

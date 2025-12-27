@@ -14,43 +14,48 @@ from nonebot_plugin_htmlrender import get_new_page
 from . import utils
 from .config import fconfig
 
-VB_FILE_NAME = "vb.png"
-VB_FILE = fconfig.data_dir / VB_FILE_NAME
 VB_FONT_PATH = Path(__file__).parent / "resources" / "LuckiestGuy.woff"
 
 
-async def update_vb_img():
+def get_vb_file() -> Path:
+    today = utils.get_utc_day()
+    return fconfig.data_dir / f"VB-{today}.png"
+
+
+async def update_vb_img(vb_file: Path | None = None):
     """更新 VB 图片（根据配置决定下载或截图）"""
+    vb_file = vb_file or get_vb_file()
 
     if fconfig.fortnite_screenshot_from_github:
         logger.info("从 GitHub Screenshots 分支下载 VB 图片...")
-        await download_vb_img_from_github()
+        await download_vb_img_from_github(vb_file)
     else:
         logger.info("从 Fortnite 网站截图 VB 图片...")
-        await screenshot_vb_img()
+        await screenshot_vb_img(vb_file)
 
-    size = utils.get_size_in_mb(VB_FILE)
+    size = utils.get_size_in_mb(vb_file)
     logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
+    return vb_file
 
 
-@utils.retry()
-async def download_vb_img_from_github():
+@utils.retry(times=10, delay=10)
+async def download_vb_img_from_github(vb_file: Path):
     """从 GitHub 分支下载 VB 图片"""
 
-    url = f"{fconfig.raw_base_url}/screenshots/{VB_FILE_NAME}"
+    url = utils.get_github_file_url(vb_file.name)
 
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.get(url)
         response.raise_for_status()
 
-    async with aiofiles.open(VB_FILE, "wb") as f:
+    async with aiofiles.open(vb_file, "wb") as f:
         await f.write(response.content)
 
 
-async def screenshot_vb_img():
+async def screenshot_vb_img(vb_file: Path):
     async with get_new_page(device_scale_factor=1) as page:
         await _screenshot_vb_img(page)
-    _combine_imgs()
+    _combine_imgs(vb_file)
 
 
 _SELECTOR_MAP: Mapping[str, tuple[str, int]] = {
@@ -60,7 +65,7 @@ _SELECTOR_MAP: Mapping[str, tuple[str, int]] = {
 }
 
 
-@utils.retry(retries=3, delay=10)
+@utils.retry()
 async def _screenshot_vb_img(page: Page):
     url = "https://freethevbucks.com/timed-missions"
 
@@ -99,7 +104,7 @@ async def _screenshot_vb_img(page: Page):
     await asyncio.gather(*[screenshot(file, *sn) for file, sn in _SELECTOR_MAP.items()])
 
 
-def _combine_imgs():
+def _combine_imgs(vb_file: Path):
     # 打开截图文件（如果存在）
     img_paths = [fconfig.cache_dir / file for file in _SELECTOR_MAP.keys()]
     img_paths = [path for path in img_paths if path.exists()]
@@ -132,7 +137,7 @@ def _combine_imgs():
                     y_offset += img.height
 
                 # 保存合并后的图像
-                combined_image.save(VB_FILE)
+                combined_image.save(vb_file)
     finally:
         # 关闭并删除所有截图文件
         for img_path in img_paths:
