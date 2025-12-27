@@ -64,23 +64,7 @@ jobs:
           # 复制新截图
           cp data/nonebot_plugin_fortnite/*.png ./ 2>/dev/null || true
 
-          # 添加 README
-          cat > README.md << 'EOF'
-          # 堡垒之夜每日截图
-
-          本分支存储每日自动生成的截图。
-
-          - **商城截图**: `shop.png`
-          - **VB图截图**: `vb.png`
-
-          ## 访问链接
-
-          商城截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/shop.png`
-
-          VB图截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/vb.png`
-          EOF
-
           # 提交并推送
-          git add shop.png vb.png README.md
+          git add SHOP-*.png VB-*.png
           git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
           git push -f origin screenshots

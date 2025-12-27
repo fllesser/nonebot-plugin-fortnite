@@ -2,7 +2,8 @@ import re
 import asyncio
 from pathlib import Path
 
-from nonebot import logger, require, get_driver, on_command, on_startswith
+from nonebot import require, get_driver, on_command, on_startswith
+from nonebot.log import logger
 from nonebot.plugin import PluginMetadata
 from nonebot.plugin.load import inherit_supported_adapters
 
@@ -77,6 +78,9 @@ async def daily_update():
         await utils.trigger_screenshot_action()
         await asyncio.sleep(90)
 
+    utils.clear_files_with_prefix("VB")
+    utils.clear_files_with_prefix("SHOP")
+
     logger.info("开始更新商城/VB图...")
     try:
         await shop.update_shop_img()
@@ -149,30 +153,39 @@ async def _(arp: Arparma, name: str):
 
 
 shop_matcher = on_startswith("商城")
+vb_matcher = on_startswith(("vb图", "VB图", "Vb图"))
 
 
 @shop_matcher.handle()
 async def _():
-    if not shop.SHOP_FILE.exists():
-        logger.info("商城图不存在, 开始更新商城...")
-        try:
-            await shop.update_shop_img()
-            size = utils.get_size_in_mb(shop.SHOP_FILE)
-            logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
-        except Exception:
-            logger.exception("商城更新失败")
+    shop_file = shop.get_shop_file()
+
+    if not shop_file.exists():
+        await UniMessage(Text("商城未更新, 请稍后再试")).finish()
+
     await UniMessage(
-        Image(path=shop.SHOP_FILE)
+        Image(path=shop_file)
         + Text("可前往 https://www.fortnite.com/item-shop?lang=zh-Hans 购买")
     ).send()
+
+
+@vb_matcher.handle()
+async def _():
+    vb_file = pve.get_vb_file()
+
+    if not vb_file.exists():
+        await UniMessage(Text("VB 图未更新, 请稍后再试")).finish()
+
+    await UniMessage(Image(path=vb_file)).send()
 
 
 @on_startswith("更新商城", permission=SUPERUSER).handle()
 async def _():
     receipt = await UniMessage.text("正在更新商城，请稍后...").send()
+
     try:
-        await shop.update_shop_img()
-        await UniMessage(Text("手动更新商城成功") + Image(path=shop.SHOP_FILE)).send()
+        shop_file = await shop.update_shop_img()
+        await UniMessage(Text("手动更新商城成功") + Image(path=shop_file)).send()
     except Exception:
         logger.exception("手动更新商城失败")
         await UniMessage(Text("手动更新商城失败")).send()
@@ -180,28 +193,13 @@ async def _():
         await receipt.recall(delay=1)
 
 
-vb_matcher = on_startswith(("vb图", "VB图", "Vb图"))
-
-
-@vb_matcher.handle()
-async def _():
-    if not pve.VB_FILE.exists():
-        logger.info("vb 图不存在, 开始更新vb图...")
-        try:
-            await pve.update_vb_img()
-            size = utils.get_size_in_mb(pve.VB_FILE)
-            logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
-        except Exception as e:
-            logger.warning(f"vb图更新失败: {e}")
-    await UniMessage(Image(path=pve.VB_FILE)).send()
-
-
 @on_startswith("更新vb图", permission=SUPERUSER).handle()
 async def _():
     receipt = await UniMessage.text("正在更新vb图, 请稍后...").send()
+
     try:
-        await pve.update_vb_img()
-        await UniMessage(Text("手动更新 VB 图成功") + Image(path=pve.VB_FILE)).send()
+        vb_file = await pve.update_vb_img()
+        await UniMessage(Text("手动更新 VB 图成功") + Image(path=vb_file)).send()
     except Exception as e:
         await UniMessage(Text(f"手动更新 VB 图失败 | {e}")).send()
     finally:
@@ -217,9 +215,9 @@ if fconfig.github_token is not None:
         await UniMessage(Text(utils.TRIGGER_SCREENSHOT_TIP)).send()
         await asyncio.sleep(70)
 
-        await shop.update_shop_img()
-        await pve.update_vb_img()
+        shop_file = await shop.update_shop_img()
+        vb_file = await pve.update_vb_img()
 
         await UniMessage(
-            Text("更新成功") + Image(path=shop.SHOP_FILE) + Image(path=pve.VB_FILE)
+            Text("更新成功") + Image(path=shop_file) + Image(path=vb_file)
         ).send()
