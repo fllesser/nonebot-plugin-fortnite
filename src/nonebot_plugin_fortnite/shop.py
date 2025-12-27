@@ -1,9 +1,11 @@
+import time
 import asyncio
 from pathlib import Path
 
+from PIL import Image, ImageDraw, ImageFont
 from nonebot import logger
+from playwright.async_api import Page
 from nonebot_plugin_htmlrender import get_new_page
-from nonebot_plugin_htmlrender.browser import Page
 
 from . import utils
 from .config import fconfig
@@ -27,7 +29,7 @@ async def update_shop_img():
     logger.success(f"商城更新成功，文件大小: {size:.2f} MB")
 
 
-@utils.retry(retries=3, delay=10)
+@utils.retry()
 async def download_shop_img_from_github():
     """从 GitHub 分支下载商城图片"""
     import httpx
@@ -45,7 +47,6 @@ async def download_shop_img_from_github():
 
 
 async def screenshot_shop_img():
-    # url = "https://www.fortnite.com/item-shop?lang=zh-Hans"
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -65,11 +66,9 @@ async def screenshot_shop_img():
         "sec-fetch-dest": "document",
         "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
     }
-    # browser = await get_browser(headless=True)
-    # context = await browser.new_context(extra_http_headers=headers)
     async with get_new_page(device_scale_factor=1, extra_http_headers=headers) as page:
         await _screenshot_shop_img(page)
-    await add_update_time()
+    _add_update_time()
 
 
 @utils.retry(3, 10)
@@ -81,7 +80,7 @@ async def _screenshot_shop_img(page: Page):
     await page.goto(url)
 
     async def wait_for_load():
-        await page.wait_for_load_state("networkidle", timeout=90000)
+        await page.wait_for_load_state("networkidle", timeout=30000)
 
     async def scroll_page():
         for _ in range(20):
@@ -94,15 +93,7 @@ async def _screenshot_shop_img(page: Page):
     await page.screenshot(path=SHOP_FILE, full_page=True)
 
 
-async def add_update_time():
-    await asyncio.to_thread(_add_update_time)
-
-
 def _add_update_time():
-    import time
-
-    from PIL import Image, ImageDraw, ImageFont
-
     font = ImageFont.truetype(GG_FONT_PATH, 88)
     with Image.open(SHOP_FILE) as img:
         draw = ImageDraw.Draw(img)

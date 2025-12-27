@@ -2,14 +2,14 @@ import time
 import asyncio
 from pathlib import Path
 from contextlib import ExitStack
+from collections.abc import Mapping
 
 import httpx
 import aiofiles
 from PIL import Image, ImageDraw, ImageFont
 from nonebot.log import logger
-from playwright.async_api import Route
+from playwright.async_api import Page, Route
 from nonebot_plugin_htmlrender import get_new_page
-from nonebot_plugin_htmlrender.browser import Page
 
 from . import utils
 from .config import fconfig
@@ -33,7 +33,7 @@ async def update_vb_img():
     logger.success(f"vb图更新成功, 文件大小: {size:.2f} MB")
 
 
-@utils.retry(retries=3, delay=10)
+@utils.retry()
 async def download_vb_img_from_github():
     """从 GitHub 分支下载 VB 图片"""
 
@@ -50,10 +50,10 @@ async def download_vb_img_from_github():
 async def screenshot_vb_img():
     async with get_new_page(device_scale_factor=1) as page:
         await _screenshot_vb_img(page)
-    await combine_imgs()
+    _combine_imgs()
 
 
-_SELECTOR_MAP = {
+_SELECTOR_MAP: Mapping[str, tuple[str, int]] = {
     "hot_info_1.png": ("div.hot-info", 0),
     "container_hidden_xs.png": ("div.container.hidden-xs", 0),
     "hot_info_2.png": ("div.hot-info", 1),
@@ -97,10 +97,6 @@ async def _screenshot_vb_img(page: Page):
             logger.warning(f"Locator for {path.name} is empty.")
 
     await asyncio.gather(*[screenshot(file, *sn) for file, sn in _SELECTOR_MAP.items()])
-
-
-async def combine_imgs():
-    await asyncio.to_thread(_combine_imgs)
 
 
 def _combine_imgs():
