@@ -13,6 +13,8 @@ async def test_vb_img(app: App):
     if vb_file.exists():
         vb_file.unlink()
 
+    await pve.update_vb_img()
+
     texts = ["vb图", "VB图", "Vb图"]
     msg_events = [fake_gme(message=text) for text in texts]
 
@@ -42,6 +44,8 @@ async def test_shop_img(app: App):
     shop_file = shop.get_shop_file()
     if shop_file.exists():
         shop_file.unlink()
+
+    await shop.update_shop_img()
 
     texts = ["商城", "商城。。。。"]
     msg_events = [fake_gme(message=text) for text in texts]
