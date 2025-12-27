@@ -73,14 +73,7 @@ jobs:
           - **商城截图**: `shop.png`
           - **VB图截图**: `vb.png`
 
-          ## 访问链接
-
-          商城截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/shop.png`
-
-          VB图截图: `https://raw.githubusercontent.com/${{ github.repository }}/screenshots/vb.png`
-          EOF
-
           # 提交并推送
-          git add shop.png vb.png README.md
+          git add SHOP-*.png VB-*.png README.md
           git commit -m "Update screenshots - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
           git push -f origin screenshots
