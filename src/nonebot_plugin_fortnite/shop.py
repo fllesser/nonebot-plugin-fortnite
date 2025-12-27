@@ -43,7 +43,7 @@ async def download_shop_img_from_github(shop_file: Path):
 
     url = utils.get_github_file_url(shop_file.name)
 
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with httpx.AsyncClient(timeout=40) as client:
         async with client.stream("GET", url) as response:
             response.raise_for_status()
             # 流式写入文件
