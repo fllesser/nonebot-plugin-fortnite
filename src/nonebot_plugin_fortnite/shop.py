@@ -93,7 +93,9 @@ async def _screenshot_shop_img(page: Page, shop_file: Path):
             await page.evaluate("""() => {
                 window.scrollBy(0, document.body.scrollHeight / 20);
             }""")
-            await asyncio.sleep(0.5)  # 等待 0.5 秒以加载内容
+            await asyncio.sleep(0.7)
+        # 回到顶部
+        await page.evaluate("window.scrollTo(0, 0);")
 
     await asyncio.gather(wait_for_load(), scroll_page())
     await page.screenshot(path=shop_file, full_page=True)
