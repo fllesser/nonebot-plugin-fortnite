@@ -1095,7 +1095,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-fortnite"
-version = "0.6.6"
+version = "0.6.7"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
