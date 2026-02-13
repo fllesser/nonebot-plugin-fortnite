@@ -86,7 +86,7 @@ async def _screenshot_shop_img(page: Page, shop_file: Path):
     await page.goto(url)
 
     async def wait_for_load():
-        await page.wait_for_load_state("networkidle", timeout=30000)
+        await page.wait_for_load_state("networkidle", timeout=50000)
 
     async def scroll_page():
         for _ in range(20):
