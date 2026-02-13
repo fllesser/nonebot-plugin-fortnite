@@ -1,5 +1,4 @@
 import os
-import asyncio
 
 import nonebot
 from nonebot import get_driver
@@ -16,7 +15,8 @@ def main():
     @get_driver().on_startup
     async def _():
         scheduler.shutdown(False)
-        await asyncio.gather(*[shop.update_shop_img(), pve.update_vb_img()])
+        await shop.update_shop_img()
+        await pve.update_vb_img()
         os._exit(0)
 
     nonebot.run()
