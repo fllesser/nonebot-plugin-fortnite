@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 from nonebot import logger
-from playwright.async_api import Page
+from playwright.async_api import Page, Route
 from nonebot_plugin_htmlrender import get_new_page
 
 from . import utils
@@ -72,18 +72,40 @@ async def screenshot_shop_img(shop_file: Path):
         "sec-fetch-dest": "document",
         "accept-language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
     }
+
     async with get_new_page(device_scale_factor=1, extra_http_headers=headers) as page:
         await _screenshot_shop_img(page, shop_file)
+
     _add_update_time(shop_file)
 
 
 @utils.retry()
 async def _screenshot_shop_img(page: Page, shop_file: Path):
-    url = "https://fortnite.gg/shop"
+    # 拦截广告
+    async def ad_block_handler(route: Route):
+        ad_domains = [
+            "adform.net",
+            "adnxs.com",
+            "adsrvr.org",
+            "facebook.com",
+            "ad-delivery.net",
+            "doubleclick.net",
+            "doubleclick.net",
+            "amazon-adsystem.com",
+            "googlesyndication.com",
+            "google-analytics.com",
+            "googleadservices.com",
+        ]
+        if any(ad_domain in route.request.url for ad_domain in ad_domains):
+            await route.abort()
+        else:
+            await route.continue_()
+
+    await page.route("**/*", ad_block_handler)
     await page.add_style_tag(
         content="* { transition: none !important; animation: none !important; }"
     )
-    await page.goto(url)
+    await page.goto("https://fortnite.gg/shop")
 
     async def wait_for_load():
         await page.wait_for_load_state("networkidle", timeout=50000)
@@ -93,7 +115,7 @@ async def _screenshot_shop_img(page: Page, shop_file: Path):
             await page.evaluate("""() => {
                 window.scrollBy(0, document.body.scrollHeight / 20);
             }""")
-            await asyncio.sleep(0.7)
+            await asyncio.sleep(1)
         # 回到顶部
         await page.evaluate("window.scrollTo(0, 0);")
 
